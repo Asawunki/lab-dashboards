@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lab Calculators Hub</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --blue:#2563eb;
+  --blue-light:#0ea5e9;
+  --violet:#7c3aed;
+  --teal:#0d9488;
+  --teal-light:#14b8a6;
+  --slate:#0f172a;
+  --muted:#64748b;
+  --border:#e2e8f0;
+}
+
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  background:#f0f5ff;
+  color:var(--slate);
+  min-height:100vh;
+  overflow-x:hidden;
+  position:relative;
+}
+
+/* ── Animated grid background ── */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(37,99,235,.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37,99,235,.055) 1px, transparent 1px);
+  background-size:44px 44px;
+  pointer-events:none;z-index:0;
+}
+
+/* ── Floating orbs ── */
+.orb{
+  position:fixed;border-radius:50%;pointer-events:none;z-index:0;
+  filter:blur(60px);opacity:.22;animation:orbDrift 18s ease-in-out infinite alternate;
+}
+.orb1{width:420px;height:420px;background:radial-gradient(circle,#2563eb,transparent);top:-120px;right:-100px;animation-duration:20s}
+.orb2{width:340px;height:340px;background:radial-gradient(circle,#7c3aed,transparent);bottom:-80px;left:-80px;animation-duration:16s;animation-delay:-8s}
+.orb3{width:260px;height:260px;background:radial-gradient(circle,#0d9488,transparent);top:40%;right:5%;animation-duration:24s;animation-delay:-4s}
+
+@keyframes orbDrift{
+  from{transform:translate(0,0) scale(1)}
+  to{transform:translate(30px,40px) scale(1.08)}
+}
+
+/* ── Floating particles ── */
+.particles{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.particle{
+  position:absolute;border-radius:50%;
+  animation:particleFloat linear infinite;
+  opacity:0;
+}
+@keyframes particleFloat{
+  0%  {opacity:0;transform:translateY(0) rotate(0deg)}
+  10% {opacity:.6}
+  90% {opacity:.4}
+  100%{opacity:0;transform:translateY(-100vh) rotate(360deg)}
+}
+
+/* ── Layout ── */
+.wrap{
+  position:relative;z-index:1;
+  max-width:820px;margin:0 auto;
+  padding:3rem 1.5rem 4rem;
+}
+
+/* ── Header ── */
+.header{text-align:center;margin-bottom:3.5rem}
+
+.lab-chip{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,0.85);backdrop-filter:blur(8px);
+  border:1px solid rgba(37,99,235,0.18);border-radius:30px;
+  padding:7px 18px 7px 12px;margin-bottom:1.4rem;
+  box-shadow:0 2px 12px rgba(37,99,235,0.1);
+}
+.chip-icon{
+  width:26px;height:26px;
+  background:linear-gradient(135deg,var(--blue),var(--violet));
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 8px rgba(37,99,235,0.3);
+}
+.chip-icon svg{width:13px;height:13px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.chip-text{font-size:11px;font-weight:700;color:var(--blue);letter-spacing:1.5px;text-transform:uppercase}
+
+.main-title{
+  font-size:clamp(32px,6vw,52px);font-weight:800;
+  color:var(--slate);line-height:1.1;letter-spacing:-1.5px;
+  margin-bottom:.6rem;
+}
+.main-title .accent{
+  background:linear-gradient(135deg,var(--blue),var(--violet));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.main-sub{
+  font-size:15px;color:var(--muted);max-width:420px;margin:0 auto;
+  line-height:1.6;letter-spacing:.3px;
+}
+
+/* ── Stats bar ── */
+.stats-bar{
+  display:flex;justify-content:center;gap:2rem;margin-top:2rem;flex-wrap:wrap;
+}
+.stat{text-align:center}
+.stat-num{font-size:22px;font-weight:800;color:var(--blue);letter-spacing:-0.5px}
+.stat-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-top:2px}
+
+/* ── Section heading ── */
+.section-head{
+  display:flex;align-items:center;gap:10px;margin-bottom:1.5rem;
+}
+.section-head-line{flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent)}
+.section-head-text{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.4px;white-space:nowrap}
+
+/* ── Tool cards grid ── */
+.tools-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
+  gap:1.5rem;
+}
+
+/* ── Individual tool card ── */
+.tool-card{
+  background:rgba(255,255,255,0.9);
+  backdrop-filter:blur(12px);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:0;
+  overflow:hidden;
+  box-shadow:0 4px 24px rgba(0,0,0,.06);
+  transition:transform 0.28s cubic-bezier(.34,1.56,.64,1), box-shadow 0.28s ease;
+  cursor:pointer;
+  text-decoration:none;
+  display:block;
+  position:relative;
+}
+.tool-card:hover{
+  transform:translateY(-6px);
+  box-shadow:0 16px 48px rgba(37,99,235,.14);
+}
+.tool-card:hover .card-arrow{transform:translateX(4px)}
+.tool-card:active{transform:translateY(-2px)}
+
+/* colour-coded top stripe */
+.card-stripe{height:5px;width:100%}
+.card-stripe.blue{background:linear-gradient(90deg,var(--blue),var(--blue-light))}
+.card-stripe.violet{background:linear-gradient(90deg,var(--violet),#a78bfa)}
+.card-stripe.teal{background:linear-gradient(90deg,var(--teal),var(--teal-light))}
+
+.card-body{padding:1.75rem}
+
+/* icon area */
+.card-icon-wrap{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:54px;height:54px;border-radius:14px;margin-bottom:1.1rem;
+  position:relative;
+}
+.card-icon-wrap.blue{background:linear-gradient(135deg,#eff6ff,#dbeafe)}
+.card-icon-wrap.violet{background:linear-gradient(135deg,#f5f3ff,#ede9fe)}
+.card-icon-wrap.teal{background:linear-gradient(135deg,#f0fdfa,#ccfbf1)}
+.card-icon{width:26px;height:26px;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.card-icon.blue{stroke:var(--blue)}
+.card-icon.violet{stroke:var(--violet)}
+.card-icon.teal{stroke:var(--teal)}
+
+/* card meta */
+.card-tag{
+  display:inline-block;font-size:9px;font-weight:700;
+  letter-spacing:1.3px;text-transform:uppercase;
+  padding:3px 9px;border-radius:20px;margin-bottom:.55rem;
+}
+.card-tag.blue{background:#eff6ff;color:var(--blue)}
+.card-tag.violet{background:#f5f3ff;color:var(--violet)}
+.card-tag.teal{background:#f0fdfa;color:var(--teal)}
+
+.card-title{
+  font-size:19px;font-weight:800;color:var(--slate);
+  letter-spacing:-0.4px;margin-bottom:.4rem;line-height:1.2;
+}
+.card-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:1.2rem}
+
+/* formula pill */
+.card-formula{
+  display:inline-flex;align-items:center;gap:6px;
+  background:#f8fafc;border:1px solid var(--border);
+  border-radius:8px;padding:7px 12px;margin-bottom:1.2rem;
+  font-size:11px;color:#475569;font-family:monospace;line-height:1.5;
+}
+.card-formula-icon{font-size:13px}
+
+/* input preview chips */
+.card-inputs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1.4rem}
+.input-chip{
+  font-size:11px;font-weight:600;padding:4px 10px;
+  border-radius:20px;font-family:monospace;
+}
+.input-chip.blue{background:#dbeafe;color:#1d4ed8}
+.input-chip.violet{background:#ede9fe;color:#6d28d9}
+.input-chip.teal{background:#ccfbf1;color:#0f766e}
+
+/* CTA button */
+.card-btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:13px;border-radius:11px;
+  font-size:14px;font-weight:700;border:none;cursor:pointer;
+  transition:all 0.22s;letter-spacing:0.3px;
+}
+.card-btn.blue{
+  background:linear-gradient(135deg,var(--blue),var(--blue-light));
+  color:#fff;box-shadow:0 4px 16px rgba(37,99,235,.3);
+}
+.card-btn.blue:hover{box-shadow:0 6px 24px rgba(37,99,235,.45)}
+.card-btn.violet{
+  background:linear-gradient(135deg,var(--violet),#a78bfa);
+  color:#fff;box-shadow:0 4px 16px rgba(124,58,237,.3);
+}
+.card-btn.violet:hover{box-shadow:0 6px 24px rgba(124,58,237,.45)}
+.card-btn.teal{
+  background:linear-gradient(135deg,var(--teal),var(--teal-light));
+  color:#fff;box-shadow:0 4px 16px rgba(13,148,136,.3);
+}
+.card-btn.teal:hover{box-shadow:0 6px 24px rgba(13,148,136,.45)}
+
+.card-arrow{
+  width:16px;height:16px;fill:none;stroke:#fff;
+  stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;
+  transition:transform 0.22s;
+}
+
+/* ── Info strip at bottom of card ── */
+.card-footer{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:.8rem 1.75rem;
+  border-top:1px solid var(--border);
+  background:#fafbfc;
+}
+.card-footer-meta{font-size:10px;color:#94a3b8;letter-spacing:.4px}
+.card-footer-dot{width:6px;height:6px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 2px rgba(34,197,94,.2)}
+
+/* ── Bottom info panel ── */
+.info-panel{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:1rem;margin-top:2rem;
+}
+.info-card{
+  background:rgba(255,255,255,0.8);backdrop-filter:blur(8px);
+  border:1px solid var(--border);border-radius:14px;
+  padding:1.2rem 1.4rem;
+  box-shadow:0 2px 10px rgba(0,0,0,.04);
+}
+.info-icon{font-size:20px;margin-bottom:.5rem}
+.info-title{font-size:13px;font-weight:700;color:var(--slate);margin-bottom:.3rem}
+.info-text{font-size:12px;color:var(--muted);line-height:1.6}
+
+/* ── Footer ── */
+.footer{
+  text-align:center;margin-top:3rem;
+  font-size:11px;color:#94a3b8;letter-spacing:.4px;
+  display:flex;flex-direction:column;align-items:center;gap:.4rem;
+}
+.footer-divider{width:40px;height:1px;background:var(--border);margin-bottom:.3rem}
+
+/* ── Responsive ── */
+@media(max-width:520px){
+  .tools-grid{grid-template-columns:1fr}
+  .stats-bar{gap:1.2rem}
+  .main-title{font-size:30px}
+}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.tool-card:nth-child(1){animation:fadeUp .5s .1s ease both}
+.tool-card:nth-child(2){animation:fadeUp .5s .22s ease both}
+</style>
+</head>
+<body>
+
+<!-- Orbs -->
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="orb orb3"></div>
+
+<!-- Floating particles -->
+<div class="particles" id="particles"></div>
+
+<div class="wrap">
+
+  <!-- ── Header ── -->
+  <div class="header">
+    <div class="lab-chip">
+      <div class="chip-icon">
+        <svg viewBox="0 0 24 24"><path d="M9 3v8l-4 6h14l-4-6V3"/><line x1="9" y1="3" x2="15" y2="3"/></svg>
+      </div>
+      <span class="chip-text">Laboratory Tools</span>
+    </div>
+    <div class="main-title">
+      Moisture &amp; Solid<br><span class="accent">Lab Hub</span>
+    </div>
+    <p class="main-sub">เครื่องมือคำนวณความชื้นและของแข็งสำหรับห้องปฏิบัติการ · Select a calculator to begin</p>
+
+    <div class="stats-bar">
+      <div class="stat"><div class="stat-num">2</div><div class="stat-lbl">Calculators</div></div>
+      <div class="stat"><div class="stat-num">100%</div><div class="stat-lbl">Browser-based</div></div>
+      <div class="stat"><div class="stat-num">ISO</div><div class="stat-lbl">Referenced</div></div>
+    </div>
+  </div>
+
+  <!-- ── Tools ── -->
+  <div class="section-head">
+    <div class="section-head-line"></div>
+    <div class="section-head-text">Available Calculators</div>
+    <div class="section-head-line"></div>
+  </div>
+
+  <div class="tools-grid">
+
+    <!-- Card 1: TS & MS -->
+    <a class="tool-card" href="ts-ms-calculator/index.html">
+      <div class="card-stripe blue"></div>
+      <div class="card-body">
+        <div class="card-icon-wrap blue">
+          <svg class="card-icon blue" viewBox="0 0 24 24">
+            <path d="M9 3v8l-4 6h14l-4-6V3"/>
+            <line x1="9" y1="3" x2="15" y2="3"/>
+          </svg>
+        </div>
+        <div class="card-tag blue">TS · MS</div>
+        <div class="card-title">TS &amp; MS Calculator</div>
+        <div class="card-desc">คำนวณ Total Solid และ Moisture Content จากน้ำหนักตัวอย่างดิบ-อบแห้ง รองรับ Blank correction และ Banker's rounding</div>
+        <div class="card-formula">
+          <span class="card-formula-icon">∑</span>
+          <span>TS = (D₃ − D₁ − B) / (D₂ − D₁) × 100<br>MS = 100 − TS</span>
+        </div>
+        <div class="card-inputs">
+          <span class="input-chip blue">D₁ · Dish</span>
+          <span class="input-chip blue">D₂ · Wet sample</span>
+          <span class="input-chip blue">D₃ · Dry sample</span>
+          <span class="input-chip blue">Blank (optional)</span>
+        </div>
+        <button class="card-btn blue" tabindex="-1">
+          Open Calculator
+          <svg class="card-arrow" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+      <div class="card-footer">
+        <span class="card-footer-meta">Single Sample · Blank Correction</span>
+        <div class="card-footer-dot"></div>
+      </div>
+    </a>
+
+    <!-- Card 2: Paper Moisture -->
+    <a class="tool-card" href="paper-moisture/index.html">
+      <div class="card-stripe violet"></div>
+      <div class="card-body">
+        <div class="card-icon-wrap violet">
+          <svg class="card-icon violet" viewBox="0 0 24 24">
+            <path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z"/>
+            <line x1="7" y1="9" x2="17" y2="9"/><line x1="7" y1="13" x2="17" y2="13"/><line x1="7" y1="17" x2="12" y2="17"/>
+          </svg>
+        </div>
+        <div class="card-tag violet">Paper Analysis</div>
+        <div class="card-title">Paper Moisture (MS)</div>
+        <div class="card-desc">คำนวณความชื้นกระดาษตาม ISO 287 และ TAPPI T412 จากน้ำหนักก่อน-หลังอบ พร้อมแสดงระดับความชื้น</div>
+        <div class="card-formula">
+          <span class="card-formula-icon">∑</span>
+          <span>MC = (W<sub>initial</sub> − W<sub>final</sub>) / W<sub>initial</sub> × 100</span>
+        </div>
+        <div class="card-inputs">
+          <span class="input-chip violet">W before drying</span>
+          <span class="input-chip violet">W after drying</span>
+        </div>
+        <button class="card-btn violet" tabindex="-1">
+          Open Calculator
+          <svg class="card-arrow" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+      <div class="card-footer">
+        <span class="card-footer-meta">ISO 287 · TAPPI T412</span>
+        <div class="card-footer-dot"></div>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- ── Info panel ── -->
+  <div class="info-panel">
+    <div class="info-card">
+      <div class="info-icon">🔢</div>
+      <div class="info-title">Banker's Rounding</div>
+      <div class="info-text">ใช้วิธีปัดเลขแบบ Round-half-to-even เพื่อลด bias สะสม เหมาะสำหรับงานห้องปฏิบัติการ</div>
+    </div>
+    <div class="info-card">
+      <div class="info-icon">⚗️</div>
+      <div class="info-title">Blank Correction</div>
+      <div class="info-text">TS &amp; MS Calculator รองรับการหักค่า Blank ทั้งแบบกรอกตรงและคำนวณจาก B_start / B_end</div>
+    </div>
+    <div class="info-card">
+      <div class="info-icon">📋</div>
+      <div class="info-title">Standard Reference</div>
+      <div class="info-text">Paper Moisture อ้างอิง ISO 287 และ TAPPI T412 — มาตรฐานสากลสำหรับความชื้นกระดาษ</div>
+    </div>
+  </div>
+
+  <!-- ── Footer ── -->
+  <div class="footer">
+    <div class="footer-divider"></div>
+    <span>Laboratory Calculators Hub · Browser-based · No data sent</span>
+    <span>Moisture Content · Total Solid · Paper Analysis</span>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  const container = document.getElementById('particles');
+  const colors = ['#bfdbfe','#ddd6fe','#a5f3fc','#bbf7d0','#fde68a','#fed7aa'];
+  for(let i = 0; i < 28; i++){
+    const el = document.createElement('div');
+    el.className = 'particle';
+    const size = 4 + Math.random() * 10;
+    const x = Math.random() * 100;
+    const dur = 20 + Math.random() * 24;
+    const delay = -Math.random() * dur;
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    el.style.cssText = `
+      width:${size}px;height:${size}px;
+      left:${x}%;bottom:-20px;
+      background:${color};
+      animation-duration:${dur}s;
+      animation-delay:${delay}s;
+    `;
+    container.appendChild(el);
+  }
+})();
+</script>
+</body>
+</html>

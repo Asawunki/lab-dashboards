@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TS & MS Calculator</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background-color:#d6e8fb;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cg fill='none' stroke='%232563eb' stroke-width='1.3' opacity='0.13'%3E%3Cline x1='40' y1='10' x2='66' y2='25'/%3E%3Cline x1='66' y1='25' x2='66' y2='55'/%3E%3Cline x1='66' y1='55' x2='40' y2='70'/%3E%3Cline x1='40' y1='70' x2='14' y2='55'/%3E%3Cline x1='14' y1='55' x2='14' y2='25'/%3E%3Cline x1='14' y1='25' x2='40' y2='10'/%3E%3C/g%3E%3Cg fill='%232563eb' opacity='0.22'%3E%3Ccircle cx='40' cy='10' r='3'/%3E%3Ccircle cx='66' cy='25' r='3'/%3E%3Ccircle cx='66' cy='55' r='3'/%3E%3Ccircle cx='40' cy='70' r='3'/%3E%3Ccircle cx='14' cy='55' r='3'/%3E%3Ccircle cx='14' cy='25' r='3'/%3E%3C/g%3E%3C/svg%3E");
+  background-size:80px 80px;
+  color:#1e2b3c;
+  min-height:100vh;
+  position:relative;
+  overflow-x:hidden;
+}
+body::before{
+  content:'';
+  position:fixed;top:-60px;right:-60px;
+  width:360px;height:360px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Ccircle cx='100' cy='100' r='14' fill='%232563eb'/%3E%3Ccircle cx='100' cy='100' r='6' fill='%23fff'/%3E%3Cellipse cx='100' cy='100' rx='88' ry='34' fill='none' stroke='%232563eb' stroke-width='4'/%3E%3Cellipse cx='100' cy='100' rx='88' ry='34' fill='none' stroke='%232563eb' stroke-width='4' transform='rotate(60 100 100)'/%3E%3Cellipse cx='100' cy='100' rx='88' ry='34' fill='none' stroke='%232563eb' stroke-width='4' transform='rotate(120 100 100)'/%3E%3C/svg%3E");
+  background-size:contain;background-repeat:no-repeat;
+  opacity:0.09;pointer-events:none;z-index:0;
+}
+body::after{
+  content:'';
+  position:fixed;bottom:-40px;left:-40px;
+  width:280px;height:330px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 125'%3E%3Crect x='38' y='4' width='24' height='36' rx='3' fill='none' stroke='%232563eb' stroke-width='3.5'/%3E%3Cpath d='M38 40 L12 98 Q7 118 26 118 L74 118 Q93 118 88 98 L62 40 Z' fill='none' stroke='%232563eb' stroke-width='3.5'/%3E%3Cpath d='M26 92 Q20 118 26 118 L74 118 Q80 118 74 92 Z' fill='%232563eb' opacity='0.2'/%3E%3Ccircle cx='42' cy='80' r='4' fill='%232563eb' opacity='0.25'/%3E%3Ccircle cx='58' cy='70' r='3' fill='%232563eb' opacity='0.2'/%3E%3Ccircle cx='50' cy='95' r='5' fill='%232563eb' opacity='0.3'/%3E%3C/svg%3E");
+  background-size:contain;background-repeat:no-repeat;
+  opacity:0.1;pointer-events:none;z-index:0;
+}
+.wrap{max-width:540px;margin:0 auto;padding:2rem 1rem 1rem;position:relative;z-index:1}
+
+.back-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  background:#fff;border:1px solid #c8d9ed;border-radius:20px;
+  padding:6px 14px 6px 10px;margin-bottom:1.2rem;
+  font-size:12px;font-weight:600;color:#2563eb;
+  text-decoration:none;cursor:pointer;
+  box-shadow:0 1px 4px rgba(30,80,160,0.07);
+  transition:all 0.2s;
+}
+.back-btn:hover{background:#eff6ff;border-color:#93c5fd;box-shadow:0 2px 8px rgba(37,99,235,0.12)}
+.back-btn svg{width:14px;height:14px;fill:none;stroke:#2563eb;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ── Header ── */
+.header{text-align:center;margin-bottom:2rem}
+.lab-bar{
+  display:inline-flex;align-items:center;gap:8px;
+  background:#fff;border:1px solid #c8d9ed;border-radius:24px;
+  padding:5px 14px 5px 10px;margin-bottom:.9rem;
+  box-shadow:0 1px 4px rgba(30,80,160,0.07);
+}
+.lab-icon{
+  width:22px;height:22px;flex-shrink:0;
+  background:linear-gradient(135deg,#2563eb,#0ea5e9);
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+}
+.lab-icon svg{width:12px;height:12px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.lab-tag{font-size:10px;font-weight:700;color:#2563eb;letter-spacing:1.2px;text-transform:uppercase}
+.title{font-size:26px;font-weight:700;color:#0f172a;margin-bottom:.3rem;letter-spacing:-0.5px}
+.title span{color:#2563eb}
+.subtitle{font-size:12px;color:#7a90aa;letter-spacing:0.4px}
+
+/* ── Section card ── */
+.section{
+  background:#fff;
+  border:1px solid #d0dcea;
+  border-top:3px solid #2563eb;
+  border-radius:10px;
+  padding:1.25rem;
+  margin-bottom:1rem;
+  box-shadow:0 2px 8px rgba(30,80,160,0.06);
+}
+.sec-label{
+  font-size:16px;color:#0f172a;
+  letter-spacing:0.5px;margin-bottom:1rem;font-weight:900;
+  display:flex;align-items:center;gap:6px;
+}
+.sec-label::after{content:'';flex:1;height:1px;background:#e8eef5}
+
+/* ── Decimal pills ── */
+.pills{display:flex;gap:8px}
+.pill{
+  flex:1;text-align:center;padding:8px 0;border-radius:7px;
+  font-size:13px;font-weight:600;cursor:pointer;
+  border:1px solid #d0dcea;background:#f4f7fb;
+  color:#7a90aa;transition:all 0.2s;
+}
+.pill:hover{border-color:#93c5fd;color:#2563eb;background:#eff6ff}
+.pill.active{
+  background:linear-gradient(135deg,#2563eb,#0ea5e9);
+  border-color:transparent;color:#fff;
+  box-shadow:0 3px 10px rgba(37,99,235,0.25);
+}
+
+/* ── Inputs ── */
+.input-row{display:flex;align-items:center;gap:12px;margin-bottom:1rem;position:relative}
+.input-row:last-of-type{margin-bottom:0}
+.inp-label{
+  font-size:14px;color:#4a6080;width:48px;flex-shrink:0;
+  font-style:italic;font-family:monospace;font-weight:600;
+}
+.inp-label sub{font-size:9px;vertical-align:sub;font-style:normal}
+input[type=number]{
+  flex:1;background:#f8fafc;border:1px solid #d0dcea;border-radius:7px;
+  padding:10px 14px;color:#0f172a;font-size:14px;outline:none;
+  transition:border-color 0.2s,box-shadow 0.2s,background 0.2s;
+  font-family:monospace;-moz-appearance:textfield;
+}
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+input[type=number]:focus{
+  border-color:#2563eb;background:#fff;
+  box-shadow:0 0 0 3px rgba(37,99,235,0.12);
+}
+input[type=number].err{border-color:#dc2626;background:#fff5f5}
+
+/* ── Result cards ── */
+.result-cards{
+  display:grid;grid-template-columns:1fr 1fr;gap:1rem;
+  margin-bottom:0;animation:fadeUp 0.4s ease both;
+}
+.rcard{
+  background:#fff;border:1px solid #d0dcea;border-radius:10px;
+  padding:1.4rem 1rem;text-align:center;
+  box-shadow:0 2px 8px rgba(30,80,160,0.06);
+  position:relative;overflow:hidden;
+}
+.rcard::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+}
+.rcard:first-child::before{background:linear-gradient(90deg,#2563eb,#0ea5e9)}
+.rcard:last-child::before{background:linear-gradient(90deg,#059669,#10b981)}
+.rcard-label{font-size:10px;color:#7a90aa;margin-bottom:.5rem;letter-spacing:1px;text-transform:uppercase;font-weight:700}
+.rcard-val{font-size:42px;font-weight:700;line-height:1;letter-spacing:-1px;font-family:monospace}
+.rcard-val.ts{color:#2563eb}
+.rcard-val.mc{color:#059669}
+.rcard-unit{font-size:13px;color:#94a3b8;margin-top:4px;font-weight:500}
+
+/* ── Blank / toggle ── */
+.blank-toggle{display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.toggle-text{font-size:14px;color:#1e2b3c;font-weight:600}
+.toggle-sub{font-size:11px;color:#7a90aa;margin-top:3px;letter-spacing:0.3px}
+.toggle-sw{
+  width:40px;height:24px;background:#d0dcea;border-radius:12px;
+  position:relative;transition:background 0.25s;flex-shrink:0;border:1px solid #c0cfe0;
+}
+.toggle-sw.on{background:#2563eb;border-color:#2563eb}
+.toggle-sw::after{
+  content:'';width:18px;height:18px;background:#fff;border-radius:50%;
+  position:absolute;top:2px;left:2px;transition:left 0.25s;
+  box-shadow:0 1px 3px rgba(0,0,0,0.15);
+}
+.toggle-sw.on::after{left:18px}
+.blank-content{margin-top:1rem;display:none;max-height:0;opacity:0;overflow:hidden;transition:all 0.3s ease}
+.blank-content.show{display:block;max-height:500px;opacity:1}
+.mode-pills{display:flex;gap:6px;margin-bottom:1rem}
+.mode-pill{
+  flex:1;text-align:center;padding:8px 0;border-radius:7px;
+  font-size:12px;cursor:pointer;border:1px solid #d0dcea;
+  background:#f4f7fb;color:#7a90aa;transition:all 0.2s;font-weight:600;
+}
+.mode-pill:hover{border-color:#93c5fd;color:#2563eb}
+.mode-pill.active{background:#eff6ff;border-color:#2563eb;color:#2563eb}
+.opt-row{
+  display:flex;align-items:center;justify-content:space-between;
+  background:#f4f7fb;border:1px solid #d0dcea;border-radius:7px;
+  padding:10px 14px;margin-top:1rem;
+}
+.opt-label{font-size:12px;color:#4a6080;line-height:1.5}
+.checkbox{width:16px;height:16px;accent-color:#2563eb;cursor:pointer;flex-shrink:0}
+
+/* ── Buttons ── */
+.btn-calc{
+  width:100%;padding:13px;border:none;border-radius:8px;
+  background:linear-gradient(135deg,#2563eb,#0ea5e9);
+  color:#fff;font-size:15px;font-weight:700;cursor:pointer;
+  transition:all 0.25s;display:flex;align-items:center;justify-content:center;gap:8px;
+  box-shadow:0 3px 12px rgba(37,99,235,0.28);letter-spacing:0.3px;
+}
+.btn-calc:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(37,99,235,0.35)}
+.btn-calc:active{transform:translateY(0);box-shadow:0 2px 8px rgba(37,99,235,0.2)}
+.btn-reset{
+  padding:13px 20px;border:1px solid #d0dcea;border-radius:8px;
+  background:#fff;color:#7a90aa;font-size:15px;cursor:pointer;
+  transition:all 0.25s;display:none;font-weight:600;
+}
+.btn-reset:hover{background:#f4f7fb;color:#1e2b3c;border-color:#2563eb}
+.btn-row{display:flex;gap:10px;margin-top:1.5rem}
+.err-msg{
+  font-size:12px;color:#dc2626;margin-top:1rem;display:none;
+  background:#fff5f5;border:1px solid #fecaca;border-radius:7px;
+  padding:10px 14px;
+}
+
+/* ── Footer watermark ── */
+.footer{text-align:center;margin-top:1.5rem;padding-bottom:1.5rem}
+.footer-text{font-size:10px;color:#b0bfcc;letter-spacing:0.5px}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <a class="back-btn" href="../index.html">
+    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    Lab Hub
+  </a>
+
+  <div class="header">
+    <div class="lab-bar">
+      <div class="lab-icon">
+        <svg viewBox="0 0 24 24"><path d="M9 3v8l-4 6h14l-4-6V3"/><line x1="9" y1="3" x2="15" y2="3"/></svg>
+      </div>
+      <span class="lab-tag">Laboratory</span>
+    </div>
+    <div class="title">TS &amp; <span>MS</span> Calculator</div>
+    <div class="subtitle">Total Solid · Moisture Content</div>
+  </div>
+
+  <div class="section">
+    <div class="sec-label">ทศนิยม</div>
+    <div class="pills" id="dp-pills">
+      <div class="pill active" data-dp="2">2</div>
+      <div class="pill" data-dp="3">3</div>
+      <div class="pill" data-dp="4">4</div>
+      <div class="pill" data-dp="5">5</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-label">Input</div>
+    <div class="input-row">
+      <div class="inp-label">D<sub>1</sub></div>
+      <input type="number" id="d1" placeholder="0" step="any">
+    </div>
+    <div class="input-row">
+      <div class="inp-label">D<sub>2</sub></div>
+      <input type="number" id="d2" placeholder="0" step="any">
+    </div>
+    <div class="input-row">
+      <div class="inp-label">D<sub>3</sub></div>
+      <input type="number" id="d3" placeholder="0" step="any">
+    </div>
+    <div class="err-msg" id="err-main"></div>
+    <div class="btn-row">
+      <button class="btn-calc" id="btn-calc">⬇ คำนวณ</button>
+      <button class="btn-reset" id="btn-reset">↺ ล้างค่า</button>
+    </div>
+  </div>
+
+  <div class="result-cards" id="result-section" style="display:none">
+    <div class="rcard">
+      <div class="rcard-label">TS (Total Solid)</div>
+      <div class="rcard-val ts" id="ts-val">—</div>
+      <div class="rcard-unit">%</div>
+    </div>
+    <div class="rcard">
+      <div class="rcard-label">MS (Moisture)</div>
+      <div class="rcard-val mc" id="ms-val">—</div>
+      <div class="rcard-unit">%</div>
+    </div>
+  </div>
+
+  <div class="section" id="blank-section" style="display:none">
+    <div class="blank-toggle" id="blank-toggle">
+      <div>
+        <div class="toggle-text">Blank Settings</div>
+        <div class="toggle-sub">B_diff · B_start · B_end</div>
+      </div>
+      <div class="toggle-sw" id="blank-sw"></div>
+    </div>
+    <div class="blank-content" id="blank-content">
+      <div class="mode-pills">
+        <div class="mode-pill active" data-mode="direct">กรอก B_diff</div>
+        <div class="mode-pill" data-mode="calc">คำนวณจาก B_start/B_end</div>
+      </div>
+      <div id="blank-direct">
+        <div class="input-row">
+          <div class="inp-label" style="font-size:12px;width:60px">B_diff</div>
+          <input type="number" id="bdiff" placeholder="0" step="any">
+        </div>
+      </div>
+      <div id="blank-calc" style="display:none">
+        <div class="input-row">
+          <div class="inp-label" style="font-size:12px;width:60px">B_start</div>
+          <input type="number" id="bstart" placeholder="0" step="any">
+        </div>
+        <div class="input-row">
+          <div class="inp-label" style="font-size:12px;width:60px">B_end</div>
+          <input type="number" id="bend" placeholder="0" step="any">
+        </div>
+      </div>
+      <div class="opt-row">
+        <div class="opt-label">นำ B_diff ที่ติดลบมาคิดด้วย<br><span style="font-size:11px;color:#94a3b8">ถ้าไม่เลือก: B_diff &lt; 0 จะถือว่า 0</span></div>
+        <input type="checkbox" class="checkbox" id="neg-opt" checked>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="footer-text">Single Sample · Bankers Rounding</div>
+  </div>
+</div>
+
+<script>
+let dp = 2;
+let blankOn = false;
+let blankMode = 'direct';
+let calculated = false;
+
+function bankersRound(num, decimals) {
+  const factor = Math.pow(10, decimals);
+  const shifted = num * factor;
+  const floor = Math.floor(shifted);
+  const diff = shifted - floor;
+  if (Math.abs(diff - 0.5) < 1e-10) {
+    return (floor % 2 === 0 ? floor : floor + 1) / factor;
+  }
+  return Math.round(shifted) / factor;
+}
+
+function fmt(n) {
+  return bankersRound(n, dp).toFixed(dp);
+}
+
+document.querySelectorAll('#dp-pills .pill').forEach(p => {
+  p.addEventListener('click', () => {
+    document.querySelectorAll('#dp-pills .pill').forEach(x => x.classList.remove('active'));
+    p.classList.add('active');
+    dp = parseInt(p.dataset.dp);
+    if (calculated) calc();
+  });
+});
+
+document.getElementById('blank-section').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('blank-toggle') ||
+      e.target === document.getElementById('blank-sw') ||
+      e.target.parentElement === document.getElementById('blank-toggle')) {
+    blankOn = !blankOn;
+    document.getElementById('blank-sw').classList.toggle('on', blankOn);
+    document.getElementById('blank-content').classList.toggle('show', blankOn);
+  }
+});
+
+document.querySelectorAll('.mode-pill').forEach(p => {
+  p.addEventListener('click', () => {
+    document.querySelectorAll('.mode-pill').forEach(x => x.classList.remove('active'));
+    p.classList.add('active');
+    blankMode = p.dataset.mode;
+    document.getElementById('blank-direct').style.display = blankMode === 'direct' ? '' : 'none';
+    document.getElementById('blank-calc').style.display = blankMode === 'calc' ? '' : 'none';
+  });
+});
+
+['d1','d2','d3','bdiff','bstart','bend'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) {
+    el.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); calc(); }
+    });
+  }
+});
+
+document.getElementById('btn-calc').addEventListener('click', calc);
+document.getElementById('btn-reset').addEventListener('click', reset);
+
+function calc() {
+  const d1v = document.getElementById('d1').value;
+  const d2v = document.getElementById('d2').value;
+  const d3v = document.getElementById('d3').value;
+  const errEl = document.getElementById('err-main');
+
+  [d1v,d2v,d3v].forEach((v,i) => {
+    document.getElementById('d'+(i+1)).classList.toggle('err', v === '' || isNaN(parseFloat(v)));
+  });
+
+  if (d1v===''||d2v===''||d3v===''||isNaN(parseFloat(d1v))||isNaN(parseFloat(d2v))||isNaN(parseFloat(d3v))) {
+    errEl.textContent = '⚠ กรุณากรอก d₁, d₂, d₃ ให้ครบ';
+    errEl.style.display = 'block';
+    return;
+  }
+  errEl.style.display = 'none';
+
+  let d1 = parseFloat(d1v), d2 = parseFloat(d2v), d3 = parseFloat(d3v);
+  const fresh = d2 - d1;
+  const dry   = d3 - d1;
+
+  if (fresh <= 0) {
+    errEl.textContent = '⚠ ค่า d₂ ต้องมากกว่า d₁';
+    errEl.style.display = 'block';
+    return;
+  }
+  if (dry < 0) {
+    errEl.textContent = '⚠ ค่า d₃ ไม่ควรน้อยกว่า d₁';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  let bdiff = 0;
+  if (blankOn) {
+    if (blankMode === 'direct') {
+      const bv = document.getElementById('bdiff').value;
+      bdiff = bv !== '' ? parseFloat(bv) : 0;
+    } else {
+      const bsv = document.getElementById('bstart').value;
+      const bev = document.getElementById('bend').value;
+      if (bsv===''||bev===''||isNaN(parseFloat(bsv))||isNaN(parseFloat(bev))) {
+        errEl.textContent = '⚠ กรุณากรอก B_start และ B_end';
+        errEl.style.display = 'block';
+        return;
+      }
+      bdiff = parseFloat(bev) - parseFloat(bsv);
+    }
+    if (!document.getElementById('neg-opt').checked && bdiff < 0) bdiff = 0;
+  }
+
+  const ts = ((dry - bdiff) / fresh) * 100;
+  const ms = 100 - ts;
+
+  document.getElementById('ts-val').textContent = fmt(ts);
+  document.getElementById('ms-val').textContent = fmt(ms);
+
+  const rs = document.getElementById('result-section');
+  rs.style.display = 'grid';
+  rs.classList.remove('fadeUp');
+  void rs.offsetWidth;
+  rs.style.animation = 'none';
+  void rs.offsetWidth;
+  rs.style.animation = '';
+
+  document.getElementById('blank-section').style.display = 'block';
+  document.getElementById('btn-reset').style.display = 'block';
+  calculated = true;
+
+  setTimeout(() => { rs.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+}
+
+function reset() {
+  ['d1','d2','d3','bdiff','bstart','bend'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.value = ''; el.classList.remove('err'); }
+  });
+  document.getElementById('result-section').style.display = 'none';
+  document.getElementById('btn-reset').style.display = 'none';
+  document.getElementById('err-main').style.display = 'none';
+  document.getElementById('ts-val').textContent = '—';
+  document.getElementById('ms-val').textContent = '—';
+  calculated = false;
+}
+</script>
+</body>
+</html>
