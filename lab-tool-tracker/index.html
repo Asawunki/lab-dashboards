@@ -1062,7 +1062,7 @@ function toggleSubItem017(id) {
 // ── Flat Section (Digester / Distillation / Shaker) ────
 
 function isPerToolCountMode() {
-  return selectedCat === 'Shaker';
+  return false;
 }
 
 function isPerItemCountMode() {
@@ -1101,17 +1101,33 @@ function renderFlatCountSection() {
   if (selectedFlatItems.length === 0) { cntSec.style.display = 'none'; return; }
   var cfg = FLAT_CAT_CONFIG[selectedCat];
   if (!cfg) return;
-  if (isPerToolCountMode()) {
+
+  // Shaker: per-item × per-tool count matrix
+  if (selectedCat === 'Shaker') {
     cntSec.style.display = 'block';
-    inner.innerHTML = selectedTools.map(function(tool) {
-      var cnt = flatCounts[tool];
-      return '<div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.35rem">'
-        + '<span style="font-size:.8rem;font-weight:700;font-family:\'JetBrains Mono\',monospace;color:#2563eb;min-width:96px">' + tool + '</span>'
-        + '<button type="button" class="btn btn-primary" style="width:auto;padding:.65rem 1.25rem;font-size:1rem" onclick="openCountModalFlat(\'' + tool + '\')">'
-        + (cnt ? cnt + ' ตัวอย่าง' : 'เลือก') + '</button>'
-        + '</div>';
+    inner.innerHTML = selectedFlatItems.map(function(itemId) {
+      var item = cfg.items.find(function(x) { return x.id === itemId; });
+      if (!item) return '';
+      var toolRows = selectedTools.map(function(toolId) {
+        var key = itemId + '|' + toolId;
+        var cnt = flatCounts[key];
+        var toolRange = (cfg.toolCountRanges || {})[toolId] || [1, 10];
+        return '<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.22rem">'
+          + '<span style="font-size:.75rem;font-weight:700;color:#2563eb;font-family:\'JetBrains Mono\',monospace;min-width:96px">'
+          + toolId + ' <span style="font-weight:500;opacity:.6">(max ' + toolRange[1] + ')</span></span>'
+          + '<button type="button" class="btn btn-primary" style="width:auto;padding:.55rem 1rem;font-size:.95rem"'
+          + ' onclick="openCountModalShaker(\'' + itemId + '\',\'' + toolId + '\')">'
+          + (cnt ? cnt + ' ตัวอย่าง' : 'เลือก') + '</button>'
+          + '</div>';
+      }).join('');
+      return '<div style="margin-bottom:.7rem">'
+        + '<div style="font-size:.83rem;font-weight:700;color:#0f172a;margin-bottom:.3rem">' + item.label + '</div>'
+        + toolRows + '</div>';
     }).join('');
-  } else if (isPerItemCountMode()) {
+    return;
+  }
+
+  if (isPerItemCountMode()) {
     var hasCountable = selectedFlatItems.some(function(id) {
       var it = cfg.items.find(function(x) { return x.id === id; });
       return !(it && it.noCount);
@@ -1161,6 +1177,17 @@ function openCountModalFlat(tool) {
   }
   openCountModal(min, max, label, function(n) {
     if (tool) { flatCounts[tool] = n; } else { flatCount = n; }
+    renderFlatCountSection();
+  });
+}
+
+function openCountModalShaker(itemId, toolId) {
+  var cfg = FLAT_CAT_CONFIG['Shaker'];
+  var item = cfg.items.find(function(x) { return x.id === itemId; });
+  var toolRange = (cfg.toolCountRanges || {})[toolId] || [1, 10];
+  var label = (item ? item.label : itemId);
+  openCountModal(toolRange[0], toolRange[1], label, function(n) {
+    flatCounts[itemId + '|' + toolId] = n;
     renderFlatCountSection();
   });
 }
@@ -1236,14 +1263,29 @@ async function startSession() {
       var item = cfg.items.find(function(x) { return x.id === id; });
       return item ? item.label + (item.detail ? ' ' + item.detail : '') : id;
     }).join(' + ');
-    if (isPerToolCountMode()) {
-      var missingTool = selectedTools.find(function(tool) { return !flatCounts[tool]; });
-      if (missingTool) {
-        msgEl.innerHTML = '<div class="msg msg-error">กรุณาเลือกจำนวนตัวอย่างของ ' + missingTool + '</div>';
+    if (selectedCat === 'Shaker') {
+      var missingCombo = null;
+      for (var si = 0; si < selectedFlatItems.length && !missingCombo; si++) {
+        for (var sj = 0; sj < selectedTools.length && !missingCombo; sj++) {
+          if (!flatCounts[selectedFlatItems[si] + '|' + selectedTools[sj]]) {
+            missingCombo = { itemId: selectedFlatItems[si], toolId: selectedTools[sj] };
+          }
+        }
+      }
+      if (missingCombo) {
+        var mci = cfg.items.find(function(x) { return x.id === missingCombo.itemId; });
+        msgEl.innerHTML = '<div class="msg msg-error">กรุณาเลือกจำนวนของ '
+          + (mci ? mci.label : missingCombo.itemId) + ' (' + missingCombo.toolId + ')</div>';
         return;
       }
-      var countStr = selectedTools.map(function(tool) { return tool + ':' + flatCounts[tool]; }).join(' / ');
-      notes = '[' + flatLabels + ' × ' + countStr + ' ตัวอย่าง]' + (notes ? ' ' + notes : '');
+      var shakerParts = selectedFlatItems.map(function(itemId) {
+        var item = cfg.items.find(function(x) { return x.id === itemId; });
+        var toolCounts = selectedTools.map(function(toolId) {
+          return toolId + ':' + flatCounts[itemId + '|' + toolId];
+        }).join('/');
+        return (item ? item.label : itemId) + '[' + toolCounts + ']';
+      }).join(', ');
+      notes = '[' + shakerParts + ' ตัวอย่าง]' + (notes ? ' ' + notes : '');
     } else if (isPerItemCountMode()) {
       var missingItem = selectedFlatItems.find(function(id) {
         var it = cfg.items.find(function(x) { return x.id === id; });
