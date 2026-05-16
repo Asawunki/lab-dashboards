@@ -582,23 +582,24 @@ const BA017_MENUS = [
       { id: 'r5', label: 'Protein ถั่วเหลือง',     detail: '1g',  group: 'g2' },
       { id: 'r6', label: 'MS นมผง',               detail: '',    group: 'g3' },
       { id: 'r7', label: 'Fat นมผง',              detail: '1g',  group: 'g3' },
+      { id: 'r8', label: 'Protein นมผง',          detail: '1g',  group: 'g3' },
     ],
   },
   {
     id: 'post', label: 'TS, Fat หลังอบ',
     hasCount: true, countRange: [1, 10],
     items: [
-      { id: 'p1', label: 'TS นมถั่วเหลืองหลังอบ', detail: '' },
-      { id: 'p2', label: 'Beaker Fat',             detail: '' },
+      { id: 'p1', label: 'TS นมถั่วเหลืองหลังอบ', detail: '', group: 'p' },
+      { id: 'p2', label: 'Beaker Fat',             detail: '', group: 'p' },
     ],
   },
   {
     id: 'chem', label: 'สารเคมี',
     hasCount: false,
     items: [
-      { id: 'c1', label: 'Ammonium sulfate',                      detail: '0.12g' },
-      { id: 'c2', label: 'Ammonium sulfate + Sucrose',            detail: '0.12g + 0.85g' },
-      { id: 'c3', label: 'Ammonium sulfate + L-Tryptophan',       detail: '0.12g + 0.67g' },
+      { id: 'c1', label: 'Ammonium sulfate',                      detail: '0.12g',        group: 'c' },
+      { id: 'c2', label: 'Ammonium sulfate + Sucrose',            detail: '0.12g + 0.85g', group: 'c' },
+      { id: 'c3', label: 'Ammonium sulfate + L-Tryptophan',       detail: '0.12g + 0.67g', group: 'c' },
     ],
   },
 ];
