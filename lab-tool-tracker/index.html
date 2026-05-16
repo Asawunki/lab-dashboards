@@ -317,17 +317,6 @@
     .modal-close{background:transparent;border:none;color:#7a90aa;font-size:1.2rem;cursor:pointer;width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center}
     .modal-close:hover{background:#f4f7fb;color:#1e2b3c}
     .modal-body{overflow-y:auto;flex:1}
-    .key-row{display:flex;gap:.5rem;margin-bottom:1rem}
-    .key-row input{flex:1;padding:.62rem .85rem;background:#f8fafc;border:1px solid #d0dcea;border-radius:7px;color:#0f172a;font-family:'JetBrains Mono',monospace;font-size:.76rem;outline:none}
-    .key-row input:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.1)}
-    .key-row button{padding:.62rem 1rem;background:linear-gradient(135deg,#2563eb,#0ea5e9);color:#fff;border:none;border-radius:7px;cursor:pointer;font-family:inherit;font-size:.85rem;font-weight:700;white-space:nowrap;box-shadow:0 2px 8px rgba(37,99,235,.25)}
-    .user-list{display:flex;flex-direction:column;gap:.5rem}
-    .user-item{background:#f8fafc;border:1px solid #d0dcea;border-radius:8px;padding:.7rem 1rem;display:flex;align-items:center;justify-content:space-between;gap:.75rem}
-    .user-name{font-family:'JetBrains Mono',monospace;font-size:.88rem;font-weight:600;color:#0f172a}
-    .user-meta{font-size:.7rem;color:#7a90aa;margin-top:.1rem}
-    .user-me{font-size:.68rem;color:#2563eb;margin-left:.35rem;font-weight:700}
-    .user-del{padding:.32rem .75rem;background:#fff;border:1px solid #d0dcea;color:#7a90aa;border-radius:6px;cursor:pointer;font-family:inherit;font-size:.78rem;font-weight:600;transition:all .18s;white-space:nowrap}
-    .user-del:hover{background:linear-gradient(135deg,#dc2626,#ef4444);border-color:transparent;color:#fff}
 
     .footer{text-align:center;padding:1.25rem 0 1.5rem}
     .footer-text{font-size:10px;color:#b0bfcc;letter-spacing:.5px}
@@ -387,7 +376,6 @@
     </div>
     <div class="topbar-right">
       <a href="../index.html" class="topbar-btn" style="text-decoration:none">← หน้าหลัก</a>
-      <button class="topbar-btn"        onclick="openUserMgmt()">👥 จัดการผู้ใช้</button>
       <button class="topbar-btn danger" onclick="handleLogout()">ออกจากระบบ</button>
     </div>
   </div>
@@ -479,23 +467,6 @@
   </div>
 </div>
 
-<!-- User Management Modal -->
-<div class="modal-overlay" id="user-modal">
-  <div class="modal">
-    <div class="modal-header">
-      <span class="modal-title">👥 จัดการผู้ใช้</span>
-      <button class="modal-close" onclick="closeUserMgmt()">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="key-row">
-        <input id="admin-key" type="password" placeholder="Service Role Key (Supabase → Settings → API)" />
-        <button onclick="loadUsers()">โหลด</button>
-      </div>
-      <div id="user-msg"></div>
-      <div class="user-list" id="user-list"></div>
-    </div>
-  </div>
-</div>
 
 <script>
 const SUPABASE_URL = 'https://sgpaeoovzjrjwcpjyiem.supabase.co';
@@ -916,57 +887,6 @@ function exportCSV() {
   a.download = 'lab-records-'+new Date().toLocaleDateString('en-CA')+'.csv'; a.click();
 }
 
-// ── User Management ───────────────────────────
-
-function openUserMgmt() {
-  var saved = sessionStorage.getItem('adminKey');
-  if (saved) document.getElementById('admin-key').value = saved;
-  document.getElementById('user-modal').classList.add('open');
-  document.getElementById('user-list').innerHTML = '';
-  document.getElementById('user-msg').innerHTML  = '';
-}
-function closeUserMgmt() { document.getElementById('user-modal').classList.remove('open'); }
-
-async function loadUsers() {
-  var key = document.getElementById('admin-key').value.trim();
-  var msgEl = document.getElementById('user-msg');
-  if (!key) { msgEl.innerHTML = '<div class="msg msg-error">กรุณากรอก Service Role Key</div>'; return; }
-  sessionStorage.setItem('adminKey', key);
-  msgEl.innerHTML = '<div class="msg msg-info">กำลังโหลด...</div>';
-  document.getElementById('user-list').innerHTML = '';
-  var res = await fetch(SUPABASE_URL+'/auth/v1/admin/users?per_page=100', {
-    headers: {'apikey':key,'Authorization':'Bearer '+key}
-  });
-  if (!res.ok) { msgEl.innerHTML = '<div class="msg msg-error">โหลดไม่สำเร็จ — ตรวจสอบ Service Role Key</div>'; return; }
-  var data = await res.json(); msgEl.innerHTML = '';
-  var users = data.users || [];
-  if (!users.length) { document.getElementById('user-list').innerHTML = '<div class="empty-state">ไม่พบผู้ใช้</div>'; return; }
-  document.getElementById('user-list').innerHTML = users.map(function(u) {
-    var name    = (u.email||u.id).replace('@'+EMAIL_DOMAIN,'');
-    var created = new Date(u.created_at).toLocaleDateString('th-TH', {day:'numeric',month:'short',year:'2-digit'});
-    var isMe    = currentUser && u.id === currentUser.id;
-    return '<div class="user-item">'
-      + '<div><div class="user-name">'+name+(isMe?'<span class="user-me">(คุณ)</span>':'')+'</div>'
-      + '<div class="user-meta">สมัครเมื่อ '+created+'</div></div>'
-      + '<button class="user-del" onclick="deleteUser(\''+u.id+'\',\''+name+'\')">ลบ</button>'
-      + '</div>';
-  }).join('');
-}
-async function deleteUser(userId, username) {
-  var key = sessionStorage.getItem('adminKey');
-  if (!key) { alert('ไม่พบ Admin Key'); return; }
-  if (!confirm('ลบผู้ใช้ "'+username+'" ?\nบันทึกทั้งหมดจะถูกลบด้วย')) return;
-  await fetch(SUPABASE_URL+'/rest/v1/tool_records?user_id=eq.'+userId, {
-    method:'DELETE', headers:{'apikey':key,'Authorization':'Bearer '+key,'Content-Type':'application/json'}
-  });
-  var res = await fetch(SUPABASE_URL+'/auth/v1/admin/users/'+userId, {
-    method:'DELETE', headers:{'apikey':key,'Authorization':'Bearer '+key}
-  });
-  if (res.ok) {
-    if (currentUser && userId === currentUser.id) { sb.auth.signOut(); return; }
-    loadUsers();
-  } else { alert('ลบไม่สำเร็จ'); }
-}
 </script>
 </body>
 </html>
