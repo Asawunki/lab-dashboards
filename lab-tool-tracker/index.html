@@ -525,6 +525,14 @@
           <button class="filter-btn"        id="f-all"   onclick="setFilter('all')">ทั้งหมด</button>
           <input  class="filter-date" type="date" id="f-date" onchange="setFilter('pick')" title="เลือกวันที่" />
         </div>
+        <div class="filter-bar" style="margin-top:-.45rem">
+          <button class="filter-btn active" id="f-cat-all"  onclick="setFilterCat('')">ทุกหมวด</button>
+          <button class="filter-btn"        id="f-cat-ba"   onclick="setFilterCat('Balance')">⚖️ ชั่ง</button>
+          <button class="filter-btn"        id="f-cat-di"   onclick="setFilterCat('Digester')">🧪 ย่อย</button>
+          <button class="filter-btn"        id="f-cat-dist" onclick="setFilterCat('Distillation')">⚗️ กลั่น</button>
+          <button class="filter-btn"        id="f-cat-sk"   onclick="setFilterCat('Shaker')">🌀 เขย่า</button>
+          <button class="filter-btn"        id="f-cat-ph"   onclick="setFilterCat('pH Meter')">💧 pH</button>
+        </div>
         <div id="record-list" class="record-list">
           <div class="empty-state">กำลังโหลด...</div>
         </div>
@@ -668,12 +676,16 @@ const CAT_LABELS = {
   'Distillation':'เครื่องกลั่น (Distillation)','Shaker':'เครื่องเขย่า (Shaker)',
   'pH Meter':'เครื่องวัด pH (pH Meter)',
 };
+const CAT_ICONS = {
+  'Balance':'⚖️', 'Digester':'🧪', 'Distillation':'⚗️', 'Shaker':'🌀', 'pH Meter':'💧',
+};
 
 let sb = null, currentUser = null, allRecords = [], authMode = 'login';
 let selectedCat = 'Balance';
 let selectedTools = ['BA-LAB-020'];
 let filterMode = 'today';
 let filterDateVal = new Date().toLocaleDateString('en-CA');
+let filterCat = '';
 let selectedSubstances = [];
 let substanceCount = null;
 let selectedMenu017 = null;
@@ -1264,6 +1276,16 @@ function renderActiveSessions() {
 
 // ── Filter ────────────────────────────────────
 
+function setFilterCat(cat) {
+  filterCat = cat;
+  ['f-cat-all','f-cat-ba','f-cat-di','f-cat-dist','f-cat-sk','f-cat-ph'].forEach(function(id, i) {
+    var cats = ['','Balance','Digester','Distillation','Shaker','pH Meter'];
+    var el = document.getElementById(id);
+    if (el) el.classList.toggle('active', filterCat === cats[i]);
+  });
+  renderRecords();
+}
+
 function setFilter(mode) {
   if (mode === 'pick') {
     var v = document.getElementById('f-date').value;
@@ -1304,11 +1326,13 @@ function renderRecordItem(r) {
     var endStr = new Date(r.end_time).toLocaleTimeString('th-TH', {hour:'2-digit',minute:'2-digit'});
     timeRow = 'เริ่ม <b>'+startStr+'</b>&nbsp;&nbsp;จบ <b>'+endStr+'</b>';
     var h = Math.floor(r.duration_minutes/60), m = Math.floor(r.duration_minutes%60), s = Math.floor((r.duration_minutes*60)%60);
-    durHtml = '<div class="rec-duration done">'+(h>0?h+':'+pad(m):m)+':'+pad(s)+'</div>';
+    var durStr = h > 0 ? h+'hr '+(m > 0 ? m+'min' : '') : (m > 0 ? m+'min'+(s > 0 ? ' '+s+'s' : '') : s+'s');
+    durHtml = '<div class="rec-duration done">'+durStr.trim()+'</div>';
   }
+  var icon = CAT_ICONS[r.category] ? ' <span style="font-size:.82em">'+CAT_ICONS[r.category]+'</span>' : '';
   return '<div class="record-item'+(isActive?' active':'')+'">'
     + '<div>'
-    + '<div class="rec-tool">'+r.tool_id+'</div>'
+    + '<div class="rec-tool">'+r.tool_id+icon+'</div>'
     + '<div class="rec-cat">'+(CAT_LABELS[r.category]||r.category)+'</div>'
     + '<div class="rec-times">'+timeRow+'</div>'
     + (r.notes ? '<div class="rec-notes">📝 '+r.notes+'</div>' : '')
@@ -1324,8 +1348,9 @@ function renderRecords() {
   var el = document.getElementById('record-list');
 
   var filtered = allRecords.filter(function(r) {
-    if (filterMode === 'all') return true;
-    return new Date(r.start_time).toLocaleDateString('en-CA') === filterDateVal;
+    var dateMatch = filterMode === 'all' || new Date(r.start_time).toLocaleDateString('en-CA') === filterDateVal;
+    var catMatch  = !filterCat || r.category === filterCat;
+    return dateMatch && catMatch;
   });
 
   document.getElementById('records-count').textContent = filtered.length;
