@@ -590,8 +590,9 @@ const BA017_MENUS = [
       { id: 'r1', label: 'MS กากถั่วเหลือง',      detail: '',    group: 'g1' },
       { id: 'r2', label: 'Protein กากถั่วเหลือง', detail: '1g',  group: 'g1' },
       { id: 'r3', label: 'Protein น้ำถั่ว',        detail: '3g',  group: 'g1' },
-      { id: 'r4', label: 'MS ถั่วเหลือง',          detail: '',    group: 'g2' },
-      { id: 'r5', label: 'Protein ถั่วเหลือง',     detail: '1g',  group: 'g2' },
+      { id: 'r4', label: 'MS ถั่วเหลือง',          detail: '',     group: 'g2' },
+      { id: 'r5', label: 'Protein ถั่วเหลือง',     detail: '1g',   group: 'g2' },
+      { id: 'r9', label: 'Fat ถั่วเหลือง',         detail: '10g',  group: 'g2' },
       { id: 'r6', label: 'MS นมผง',               detail: '',    group: 'g3' },
       { id: 'r7', label: 'Fat นมผง',              detail: '1g',  group: 'g3' },
       { id: 'r8', label: 'Protein นมผง',          detail: '1g',  group: 'g3' },
@@ -620,6 +621,7 @@ const FLAT_CAT_CONFIG = {
   'Digester': {
     countRange: [1, 10],
     items: [
+      { id: 'fd_bl', label: 'Blank',                   detail: ''    },
       { id: 'fd_s2', label: 'Protein นมถั่วเหลือง',   detail: '3g'  },
       { id: 'fd_r2', label: 'Protein กากถั่วเหลือง',  detail: '1g'  },
       { id: 'fd_r3', label: 'Protein น้ำถั่ว',         detail: '3g'  },
@@ -632,6 +634,7 @@ const FLAT_CAT_CONFIG = {
   'Distillation': {
     countRange: [1, 10],
     items: [
+      { id: 'fi_bl', label: 'Blank',                   detail: ''    },
       { id: 'fi_s2', label: 'Protein นมถั่วเหลือง',   detail: '3g'  },
       { id: 'fi_r2', label: 'Protein กากถั่วเหลือง',  detail: '1g'  },
       { id: 'fi_r3', label: 'Protein น้ำถั่ว',         detail: '3g'  },
