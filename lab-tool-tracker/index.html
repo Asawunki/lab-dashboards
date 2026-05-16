@@ -448,6 +448,18 @@
           </div>
         </div>
 
+        <!-- Flat selector for Digester / Distillation -->
+        <div id="flat-section" style="display:none;margin-bottom:.75rem">
+          <span class="form-label">รายการที่ใช้</span>
+          <div id="flat-pills" class="subst-pills"></div>
+          <div id="flat-count-section" style="display:none;margin-top:.6rem">
+            <span class="form-label">จำนวนตัวอย่าง</span>
+            <button type="button" class="btn btn-primary" style="width:auto;padding:.65rem 1.2rem;font-size:.9rem" onclick="openCountModalFlat()">
+              <span id="flat-count-display">เลือก</span>
+            </button>
+          </div>
+        </div>
+
         <!-- BA-LAB-017 section -->
         <div id="substance-017-section" style="display:none;margin-bottom:.75rem">
           <span class="form-label">หมวดตัวอย่าง</span>
@@ -604,6 +616,34 @@ const BA017_MENUS = [
   },
 ];
 
+const FLAT_CAT_CONFIG = {
+  'Digester': {
+    countRange: [1, 10],
+    items: [
+      { id: 'fd_s2', label: 'Protein นมถั่วเหลือง',   detail: '3g'  },
+      { id: 'fd_r2', label: 'Protein กากถั่วเหลือง',  detail: '1g'  },
+      { id: 'fd_r3', label: 'Protein น้ำถั่ว',         detail: '3g'  },
+      { id: 'fd_r5', label: 'Protein ถั่วเหลือง',      detail: '1g'  },
+      { id: 'fd_r8', label: 'Protein นมผง',            detail: '1g'  },
+      { id: 'fd_c2', label: 'Ammonium sulfate + Sucrose',    detail: '0.12g + 0.85g' },
+      { id: 'fd_c3', label: 'L-Tryptophan + Sucrose',       detail: '0.18g + 0.67g' },
+    ],
+  },
+  'Distillation': {
+    countRange: [1, 10],
+    items: [
+      { id: 'fi_s2', label: 'Protein นมถั่วเหลือง',   detail: '3g'  },
+      { id: 'fi_r2', label: 'Protein กากถั่วเหลือง',  detail: '1g'  },
+      { id: 'fi_r3', label: 'Protein น้ำถั่ว',         detail: '3g'  },
+      { id: 'fi_r5', label: 'Protein ถั่วเหลือง',      detail: '1g'  },
+      { id: 'fi_r8', label: 'Protein นมผง',            detail: '1g'  },
+      { id: 'fi_c1', label: 'Ammonium sulfate',               detail: '0.12g'         },
+      { id: 'fi_c2', label: 'Ammonium sulfate + Sucrose',     detail: '0.12g + 0.85g' },
+      { id: 'fi_c3', label: 'L-Tryptophan + Sucrose',        detail: '0.18g + 0.67g' },
+    ],
+  },
+};
+
 const CAT_LABELS = {
   'Balance':'เครื่องชั่ง (Balance)','Digester':'เครื่องย่อย (Digester)',
   'Distillation':'เครื่องกลั่น (Distillation)','Shaker':'เครื่องเขย่า (Shaker)',
@@ -620,6 +660,8 @@ let substanceCount = null;
 let selectedMenu017 = null;
 let selectedSubItems017 = [];
 let substanceCount017 = null;
+let selectedFlatItems = [];
+let flatCount = null;
 var _countModalOnSelect = null;
 
 // Category pills
@@ -628,6 +670,7 @@ document.querySelectorAll('.cat-pill').forEach(function(p) {
     document.querySelectorAll('.cat-pill').forEach(function(x) { x.classList.remove('active'); });
     p.classList.add('active');
     selectedCat = p.dataset.cat;
+    selectedFlatItems = []; flatCount = null;
     updateToolSelect();
   });
 });
@@ -723,6 +766,7 @@ function updateToolSelect() {
   if (hint) hint.style.display = isMulti ? 'block' : 'none';
   updateSubstanceSection();
   updateBA017Section();
+  updateFlatSection();
 }
 
 function toggleTool(tool) {
@@ -748,6 +792,7 @@ function toggleTool(tool) {
   }).join('');
   updateSubstanceSection();
   updateBA017Section();
+  updateFlatSection();
 }
 
 // ── Substance Select ──────────────────────────
@@ -943,6 +988,57 @@ function toggleSubItem017(id) {
   renderSubSection017();
 }
 
+// ── Flat Section (Digester / Distillation) ────
+
+function updateFlatSection() {
+  var el = document.getElementById('flat-section');
+  if (!el) return;
+  var cfg = FLAT_CAT_CONFIG[selectedCat];
+  el.style.display = cfg ? 'block' : 'none';
+  if (!cfg) { selectedFlatItems = []; flatCount = null; }
+  renderFlatPills();
+}
+
+function renderFlatPills() {
+  var container = document.getElementById('flat-pills');
+  var cntSec    = document.getElementById('flat-count-section');
+  if (!container) return;
+  var cfg = FLAT_CAT_CONFIG[selectedCat];
+  if (!cfg) { container.innerHTML = ''; return; }
+  var isMulti = selectedFlatItems.length > 1;
+  container.innerHTML = cfg.items.map(function(item) {
+    var isActive = selectedFlatItems.indexOf(item.id) !== -1;
+    var cls = 'subst-pill' + (isActive ? ' active' : '') + (isActive && isMulti ? ' multi' : '');
+    var label = item.label + (item.detail ? ' <span class="subst-sub">' + item.detail + '</span>' : '');
+    return '<div class="' + cls + '" onclick="toggleFlatItem(\'' + item.id + '\')">' + label + '</div>';
+  }).join('');
+  if (cntSec) {
+    cntSec.style.display = selectedFlatItems.length > 0 ? 'block' : 'none';
+    var dispEl = document.getElementById('flat-count-display');
+    if (dispEl) dispEl.textContent = flatCount ? flatCount + ' ตัวอย่าง' : 'เลือก';
+  }
+}
+
+function toggleFlatItem(id) {
+  var idx = selectedFlatItems.indexOf(id);
+  if (idx === -1) selectedFlatItems.push(id);
+  else selectedFlatItems.splice(idx, 1);
+  flatCount = null;
+  renderFlatPills();
+}
+
+function openCountModalFlat() {
+  var cfg = FLAT_CAT_CONFIG[selectedCat];
+  if (!cfg) return;
+  openCountModal(cfg.countRange[0], cfg.countRange[1], function(n) {
+    flatCount = n;
+    var el = document.getElementById('flat-count-display');
+    if (el) el.textContent = n + ' ตัวอย่าง';
+    var cntSec = document.getElementById('flat-count-section');
+    if (cntSec) cntSec.style.display = 'block';
+  });
+}
+
 // ── Sessions ──────────────────────────────────
 
 async function startSession() {
@@ -997,6 +1093,24 @@ async function startSession() {
     notes = prefix017 + (notes ? ' ' + notes : '');
   }
 
+  // Validate flat selector for Digester / Distillation
+  if (FLAT_CAT_CONFIG[selectedCat]) {
+    if (selectedFlatItems.length === 0) {
+      msgEl.innerHTML = '<div class="msg msg-error">กรุณาเลือกรายการที่ใช้</div>';
+      return;
+    }
+    if (!flatCount) {
+      msgEl.innerHTML = '<div class="msg msg-error">กรุณาเลือกจำนวนตัวอย่าง</div>';
+      return;
+    }
+    var cfg = FLAT_CAT_CONFIG[selectedCat];
+    var flatLabels = selectedFlatItems.map(function(id) {
+      var item = cfg.items.find(function(x) { return x.id === id; });
+      return item ? item.label + (item.detail ? ' ' + item.detail : '') : id;
+    }).join(' + ');
+    notes = '[' + flatLabels + ' × ' + flatCount + ' ตัวอย่าง]' + (notes ? ' ' + notes : '');
+  }
+
   var startDT = new Date(dateVal + 'T' + startVal);
 
   // Check if any selected tool already has an active record
@@ -1043,6 +1157,8 @@ async function startSession() {
   renderSubstancePills(); renderCountSection();
   selectedMenu017 = null; selectedSubItems017 = []; substanceCount017 = null;
   renderMenuPills017();
+  selectedFlatItems = []; flatCount = null;
+  renderFlatPills();
   renderActiveSessions();
   renderRecords();
 }
