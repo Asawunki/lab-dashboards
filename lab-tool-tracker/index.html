@@ -124,8 +124,12 @@
     .topbar-btn.danger:hover{background:#fff5f5;border-color:#fca5a5;color:#dc2626}
     @media(max-width:480px){
       .topbar{padding:.6rem .9rem}
-      .topbar-title{font-size:.82rem}
-      .topbar-btn{font-size:.65rem;padding:.3rem .6rem}
+      .topbar-btn{padding:.35rem .75rem}
+      .topbar-short{display:inline}
+      .topbar-long{display:none}
+    }
+    @media(min-width:481px){
+      .topbar-short{display:none}
     }
 
     .main{
@@ -426,8 +430,8 @@
       </div>
     </div>
     <div class="topbar-right">
-      <a href="../index.html" class="topbar-btn" style="text-decoration:none">← หน้าหลัก</a>
-      <button class="topbar-btn danger" onclick="handleLogout()">ออกจากระบบ</button>
+      <a href="../index.html" class="topbar-btn" style="text-decoration:none"><span class="topbar-long">← หน้าหลัก</span><span class="topbar-short">←</span></a>
+      <button class="topbar-btn danger" onclick="handleLogout()"><span class="topbar-long">ออกจากระบบ</span><span class="topbar-short">ออก</span></button>
     </div>
   </div>
 
