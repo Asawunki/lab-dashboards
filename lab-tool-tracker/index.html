@@ -122,14 +122,10 @@
     }
     .topbar-btn:hover{background:#fff;border-color:#93c5fd;color:#2563eb;box-shadow:0 4px 12px rgba(37,99,235,0.1)}
     .topbar-btn.danger:hover{background:#fff5f5;border-color:#fca5a5;color:#dc2626}
-    @media(max-width:480px){
-      .topbar{padding:.6rem .9rem}
-      .topbar-btn{padding:.35rem .75rem}
-      .topbar-short{display:inline}
-      .topbar-long{display:none}
-    }
-    @media(min-width:481px){
-      .topbar-short{display:none}
+    @media(max-width:520px){
+      .topbar{flex-wrap:wrap;row-gap:.5rem;padding:.75rem 1rem}
+      .topbar-brand{flex:1 1 100%}
+      .topbar-right{width:100%}
     }
 
     .main{
@@ -430,8 +426,8 @@
       </div>
     </div>
     <div class="topbar-right">
-      <a href="../index.html" class="topbar-btn" style="text-decoration:none"><span class="topbar-long">← หน้าหลัก</span><span class="topbar-short">←</span></a>
-      <button class="topbar-btn danger" onclick="handleLogout()"><span class="topbar-long">ออกจากระบบ</span><span class="topbar-short">ออก</span></button>
+      <a href="../index.html" class="topbar-btn" style="text-decoration:none">← หน้าหลัก</a>
+      <button class="topbar-btn danger" onclick="handleLogout()">ออกจากระบบ</button>
     </div>
   </div>
 
@@ -653,8 +649,8 @@ const FLAT_CAT_CONFIG = {
       { id: 'fd_r3', label: 'Protein น้ำถั่ว',              detail: '' },
       { id: 'fd_r5', label: 'Protein ถั่วเหลือง',           detail: '' },
       { id: 'fd_r8', label: 'Protein นมผง',                 detail: '' },
-      { id: 'fd_c2', label: 'Ammonium sulfate + Sucrose',   detail: '' },
-      { id: 'fd_c3', label: 'L-Tryptophan + Sucrose',       detail: '' },
+      { id: 'fd_c2', label: 'Ammonium sulfate + Sucrose',   detail: '', noCount: true },
+      { id: 'fd_c3', label: 'L-Tryptophan + Sucrose',       detail: '', noCount: true },
     ],
   },
   'Distillation': {
@@ -666,9 +662,9 @@ const FLAT_CAT_CONFIG = {
       { id: 'fi_r3', label: 'Protein น้ำถั่ว',              detail: '' },
       { id: 'fi_r5', label: 'Protein ถั่วเหลือง',           detail: '' },
       { id: 'fi_r8', label: 'Protein นมผง',                 detail: '' },
-      { id: 'fi_c1', label: 'Ammonium sulfate',             detail: '' },
-      { id: 'fi_c2', label: 'Ammonium sulfate + Sucrose',   detail: '' },
-      { id: 'fi_c3', label: 'L-Tryptophan + Sucrose',       detail: '' },
+      { id: 'fi_c1', label: 'Ammonium sulfate',             detail: '', noCount: true },
+      { id: 'fi_c2', label: 'Ammonium sulfate + Sucrose',   detail: '', noCount: true },
+      { id: 'fi_c3', label: 'L-Tryptophan + Sucrose',       detail: '', noCount: true },
     ],
   },
   'Shaker': {
@@ -676,7 +672,8 @@ const FLAT_CAT_CONFIG = {
     items: [
       { id: 'sk_1', label: 'Fat นมถั่วเหลือง', detail: '' },
       { id: 'sk_2', label: 'Fat ถั่วเหลือง',   detail: '' },
-      { id: 'sk_3', label: 'Fat อื่นๆ',        detail: '' },
+      { id: 'sk_3', label: 'Fat นมผง',         detail: '' },
+      { id: 'sk_4', label: 'Fat อื่นๆ',        detail: '' },
     ],
   },
   'pH Meter': {
@@ -1068,7 +1065,8 @@ function isPerToolCountMode() {
 }
 
 function isPerItemCountMode() {
-  return selectedCat === 'Digester' || selectedCat === 'Distillation' || selectedCat === 'pH Meter';
+  return selectedCat === 'Digester' || selectedCat === 'Distillation' || selectedCat === 'pH Meter'
+    || (selectedCat === 'Shaker' && selectedTools.length === 1);
 }
 
 function updateFlatSection() {
@@ -1101,10 +1099,10 @@ function renderFlatCountSection() {
   var inner  = document.getElementById('flat-count-inner');
   if (!cntSec || !inner) return;
   if (selectedFlatItems.length === 0) { cntSec.style.display = 'none'; return; }
-  cntSec.style.display = 'block';
   var cfg = FLAT_CAT_CONFIG[selectedCat];
   if (!cfg) return;
   if (isPerToolCountMode()) {
+    cntSec.style.display = 'block';
     inner.innerHTML = selectedTools.map(function(tool) {
       var cnt = flatCounts[tool];
       return '<div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.35rem">'
@@ -1114,9 +1112,14 @@ function renderFlatCountSection() {
         + '</div>';
     }).join('');
   } else if (isPerItemCountMode()) {
+    var hasCountable = selectedFlatItems.some(function(id) {
+      var it = cfg.items.find(function(x) { return x.id === id; });
+      return !(it && it.noCount);
+    });
+    cntSec.style.display = hasCountable ? 'block' : 'none';
     inner.innerHTML = selectedFlatItems.map(function(id) {
       var item = cfg.items.find(function(x) { return x.id === id; });
-      if (!item) return '';
+      if (!item || item.noCount) return '';
       var cnt = flatCounts[id];
       var label = item.label + (item.detail ? ' <span style="font-size:.8em;opacity:.7">' + item.detail + '</span>' : '');
       return '<div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.35rem">'
@@ -1126,6 +1129,7 @@ function renderFlatCountSection() {
         + '</div>';
     }).join('');
   } else {
+    cntSec.style.display = 'block';
     inner.innerHTML = '<button type="button" class="btn btn-primary" style="width:auto;padding:.75rem 1.5rem;font-size:1.05rem" onclick="openCountModalFlat(null)">'
       + (flatCount ? flatCount + ' ตัวอย่าง' : 'เลือก') + '</button>';
   }
@@ -1239,7 +1243,10 @@ async function startSession() {
       var countStr = selectedTools.map(function(tool) { return tool + ':' + flatCounts[tool]; }).join(' / ');
       notes = '[' + flatLabels + ' × ' + countStr + ' ตัวอย่าง]' + (notes ? ' ' + notes : '');
     } else if (isPerItemCountMode()) {
-      var missingItem = selectedFlatItems.find(function(id) { return !flatCounts[id]; });
+      var missingItem = selectedFlatItems.find(function(id) {
+        var it = cfg.items.find(function(x) { return x.id === id; });
+        return !(it && it.noCount) && !flatCounts[id];
+      });
       if (missingItem) {
         var mi = cfg.items.find(function(x) { return x.id === missingItem; });
         msgEl.innerHTML = '<div class="msg msg-error">กรุณาเลือกจำนวนตัวอย่างของ ' + (mi ? mi.label : missingItem) + '</div>';
@@ -1247,7 +1254,8 @@ async function startSession() {
       }
       var noteParts = selectedFlatItems.map(function(id) {
         var item = cfg.items.find(function(x) { return x.id === id; });
-        return (item ? item.label : id) + ' × ' + flatCounts[id];
+        var count = (item && item.noCount) ? 1 : flatCounts[id];
+        return (item ? item.label : id) + ' × ' + count;
       }).join(' / ');
       notes = '[' + noteParts + ' ตัวอย่าง]' + (notes ? ' ' + notes : '');
     } else {
