@@ -469,9 +469,7 @@
           <div id="flat-pills" class="subst-pills"></div>
           <div id="flat-count-section" style="display:none;margin-top:.6rem">
             <span class="form-label">จำนวนตัวอย่าง</span>
-            <button type="button" class="btn btn-primary" style="width:auto;padding:.65rem 1.2rem;font-size:.9rem" onclick="openCountModalFlat()">
-              <span id="flat-count-display">เลือก</span>
-            </button>
+            <div id="flat-count-inner"></div>
           </div>
         </div>
 
@@ -708,6 +706,7 @@ let selectedSubItems017 = [];
 let substanceCount017 = null;
 let selectedFlatItems = [];
 let flatCount = null;
+let flatCounts = {};
 var _countModalOnSelect = null;
 
 // Category pills
@@ -1034,20 +1033,24 @@ function toggleSubItem017(id) {
   renderSubSection017();
 }
 
-// ── Flat Section (Digester / Distillation) ────
+// ── Flat Section (Digester / Distillation / Shaker) ────
+
+function isPerToolCountMode() {
+  return selectedCat === 'Shaker' && selectedTools.length > 1;
+}
 
 function updateFlatSection() {
   var el = document.getElementById('flat-section');
   if (!el) return;
   var cfg = FLAT_CAT_CONFIG[selectedCat];
   el.style.display = cfg ? 'block' : 'none';
-  if (!cfg) { selectedFlatItems = []; flatCount = null; }
+  if (!cfg) { selectedFlatItems = []; }
+  flatCount = null; flatCounts = {};
   renderFlatPills();
 }
 
 function renderFlatPills() {
   var container = document.getElementById('flat-pills');
-  var cntSec    = document.getElementById('flat-count-section');
   if (!container) return;
   var cfg = FLAT_CAT_CONFIG[selectedCat];
   if (!cfg) { container.innerHTML = ''; return; }
@@ -1058,10 +1061,29 @@ function renderFlatPills() {
     var label = item.label + (item.detail ? ' <span class="subst-sub">' + item.detail + '</span>' : '');
     return '<div class="' + cls + '" onclick="toggleFlatItem(\'' + item.id + '\')">' + label + '</div>';
   }).join('');
-  if (cntSec) {
-    cntSec.style.display = selectedFlatItems.length > 0 ? 'block' : 'none';
-    var dispEl = document.getElementById('flat-count-display');
-    if (dispEl) dispEl.textContent = flatCount ? flatCount + ' ตัวอย่าง' : 'เลือก';
+  renderFlatCountSection();
+}
+
+function renderFlatCountSection() {
+  var cntSec = document.getElementById('flat-count-section');
+  var inner  = document.getElementById('flat-count-inner');
+  if (!cntSec || !inner) return;
+  if (selectedFlatItems.length === 0) { cntSec.style.display = 'none'; return; }
+  cntSec.style.display = 'block';
+  var cfg = FLAT_CAT_CONFIG[selectedCat];
+  if (!cfg) return;
+  if (isPerToolCountMode()) {
+    inner.innerHTML = selectedTools.map(function(tool) {
+      var cnt = flatCounts[tool];
+      return '<div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.35rem">'
+        + '<span style="font-size:.8rem;font-weight:700;font-family:\'JetBrains Mono\',monospace;color:#2563eb;min-width:96px">' + tool + '</span>'
+        + '<button type="button" class="btn btn-primary" style="width:auto;padding:.55rem 1rem;font-size:.85rem" onclick="openCountModalFlat(\'' + tool + '\')">'
+        + (cnt ? cnt + ' ตัวอย่าง' : 'เลือก') + '</button>'
+        + '</div>';
+    }).join('');
+  } else {
+    inner.innerHTML = '<button type="button" class="btn btn-primary" style="width:auto;padding:.65rem 1.2rem;font-size:.9rem" onclick="openCountModalFlat(null)">'
+      + (flatCount ? flatCount + ' ตัวอย่าง' : 'เลือก') + '</button>';
   }
 }
 
@@ -1069,19 +1091,16 @@ function toggleFlatItem(id) {
   var idx = selectedFlatItems.indexOf(id);
   if (idx === -1) selectedFlatItems.push(id);
   else selectedFlatItems.splice(idx, 1);
-  flatCount = null;
+  flatCount = null; flatCounts = {};
   renderFlatPills();
 }
 
-function openCountModalFlat() {
+function openCountModalFlat(tool) {
   var cfg = FLAT_CAT_CONFIG[selectedCat];
   if (!cfg) return;
   openCountModal(cfg.countRange[0], cfg.countRange[1], function(n) {
-    flatCount = n;
-    var el = document.getElementById('flat-count-display');
-    if (el) el.textContent = n + ' ตัวอย่าง';
-    var cntSec = document.getElementById('flat-count-section');
-    if (cntSec) cntSec.style.display = 'block';
+    if (tool) { flatCounts[tool] = n; } else { flatCount = n; }
+    renderFlatCountSection();
   });
 }
 
@@ -1139,14 +1158,10 @@ async function startSession() {
     notes = prefix017 + (notes ? ' ' + notes : '');
   }
 
-  // Validate flat selector for Digester / Distillation
+  // Validate flat selector for Digester / Distillation / Shaker
   if (FLAT_CAT_CONFIG[selectedCat]) {
     if (selectedFlatItems.length === 0) {
       msgEl.innerHTML = '<div class="msg msg-error">กรุณาเลือกรายการที่ใช้</div>';
-      return;
-    }
-    if (!flatCount) {
-      msgEl.innerHTML = '<div class="msg msg-error">กรุณาเลือกจำนวนตัวอย่าง</div>';
       return;
     }
     var cfg = FLAT_CAT_CONFIG[selectedCat];
@@ -1154,7 +1169,21 @@ async function startSession() {
       var item = cfg.items.find(function(x) { return x.id === id; });
       return item ? item.label + (item.detail ? ' ' + item.detail : '') : id;
     }).join(' + ');
-    notes = '[' + flatLabels + ' × ' + flatCount + ' ตัวอย่าง]' + (notes ? ' ' + notes : '');
+    if (isPerToolCountMode()) {
+      var missingTool = selectedTools.find(function(tool) { return !flatCounts[tool]; });
+      if (missingTool) {
+        msgEl.innerHTML = '<div class="msg msg-error">กรุณาเลือกจำนวนตัวอย่างของ ' + missingTool + '</div>';
+        return;
+      }
+      var countStr = selectedTools.map(function(tool) { return tool + ':' + flatCounts[tool]; }).join(' / ');
+      notes = '[' + flatLabels + ' × ' + countStr + ' ตัวอย่าง]' + (notes ? ' ' + notes : '');
+    } else {
+      if (!flatCount) {
+        msgEl.innerHTML = '<div class="msg msg-error">กรุณาเลือกจำนวนตัวอย่าง</div>';
+        return;
+      }
+      notes = '[' + flatLabels + ' × ' + flatCount + ' ตัวอย่าง]' + (notes ? ' ' + notes : '');
+    }
   }
 
   var startDT = new Date(dateVal + 'T' + startVal);
@@ -1203,7 +1232,7 @@ async function startSession() {
   renderSubstancePills(); renderCountSection();
   selectedMenu017 = null; selectedSubItems017 = []; substanceCount017 = null;
   renderMenuPills017();
-  selectedFlatItems = []; flatCount = null;
+  selectedFlatItems = []; flatCount = null; flatCounts = {};
   renderFlatPills();
   renderActiveSessions();
   renderRecords();
