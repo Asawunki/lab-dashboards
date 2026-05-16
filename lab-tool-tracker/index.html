@@ -1050,6 +1050,10 @@ function isPerToolCountMode() {
   return selectedCat === 'Shaker' && selectedTools.length > 1;
 }
 
+function isPerItemCountMode() {
+  return selectedCat === 'Digester' || selectedCat === 'Distillation' || selectedCat === 'pH Meter';
+}
+
 function updateFlatSection() {
   var el = document.getElementById('flat-section');
   if (!el) return;
@@ -1089,6 +1093,18 @@ function renderFlatCountSection() {
       return '<div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.35rem">'
         + '<span style="font-size:.8rem;font-weight:700;font-family:\'JetBrains Mono\',monospace;color:#2563eb;min-width:96px">' + tool + '</span>'
         + '<button type="button" class="btn btn-primary" style="width:auto;padding:.55rem 1rem;font-size:.85rem" onclick="openCountModalFlat(\'' + tool + '\')">'
+        + (cnt ? cnt + ' ตัวอย่าง' : 'เลือก') + '</button>'
+        + '</div>';
+    }).join('');
+  } else if (isPerItemCountMode()) {
+    inner.innerHTML = selectedFlatItems.map(function(id) {
+      var item = cfg.items.find(function(x) { return x.id === id; });
+      if (!item) return '';
+      var cnt = flatCounts[id];
+      var label = item.label + (item.detail ? ' <span style="font-size:.8em;opacity:.7">' + item.detail + '</span>' : '');
+      return '<div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.35rem">'
+        + '<span style="font-size:.8rem;font-weight:600;color:#2563eb;min-width:130px">' + label + '</span>'
+        + '<button type="button" class="btn btn-primary" style="width:auto;padding:.55rem 1rem;font-size:.85rem" onclick="openCountModalFlat(\'' + id + '\')">'
         + (cnt ? cnt + ' ตัวอย่าง' : 'เลือก') + '</button>'
         + '</div>';
     }).join('');
@@ -1194,6 +1210,18 @@ async function startSession() {
       }
       var countStr = selectedTools.map(function(tool) { return tool + ':' + flatCounts[tool]; }).join(' / ');
       notes = '[' + flatLabels + ' × ' + countStr + ' ตัวอย่าง]' + (notes ? ' ' + notes : '');
+    } else if (isPerItemCountMode()) {
+      var missingItem = selectedFlatItems.find(function(id) { return !flatCounts[id]; });
+      if (missingItem) {
+        var mi = cfg.items.find(function(x) { return x.id === missingItem; });
+        msgEl.innerHTML = '<div class="msg msg-error">กรุณาเลือกจำนวนตัวอย่างของ ' + (mi ? mi.label : missingItem) + '</div>';
+        return;
+      }
+      var noteParts = selectedFlatItems.map(function(id) {
+        var item = cfg.items.find(function(x) { return x.id === id; });
+        return (item ? item.label : id) + ' × ' + flatCounts[id];
+      }).join(' / ');
+      notes = '[' + noteParts + ' ตัวอย่าง]' + (notes ? ' ' + notes : '');
     } else {
       if (!flatCount) {
         msgEl.innerHTML = '<div class="msg msg-error">กรุณาเลือกจำนวนตัวอย่าง</div>';
