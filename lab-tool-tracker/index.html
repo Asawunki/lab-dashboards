@@ -937,7 +937,8 @@ function toggleSubItem017(id) {
     if (idx === -1) selectedSubItems017.push(id);
     else selectedSubItems017.splice(idx, 1);
   }
-  substanceCount017 = null;
+  // Only reset count if menu requires count selection
+  if (menu.hasCount) substanceCount017 = null;
   renderSubPills017();
   renderSubSection017();
 }
