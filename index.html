@@ -275,6 +275,16 @@ body::before{
   .tools-grid{grid-template-columns:1fr}
   .stats-bar{gap:1.2rem}
   .main-title{font-size:30px}
+  .card-body{padding:1.1rem}
+  .card-formula{display:none}
+  .card-inputs{gap:4px;margin-bottom:1rem}
+  .input-chip{font-size:10px;padding:3px 8px}
+  .card-desc{font-size:12px;margin-bottom:.9rem}
+  .card-btn{padding:11px;font-size:13px}
+  .card-icon-wrap{width:44px;height:44px;border-radius:11px;margin-bottom:.75rem}
+  .card-icon{width:22px;height:22px}
+  .card-title{font-size:16px}
+  .card-footer{padding:.65rem 1.1rem}
 }
 
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
@@ -358,40 +368,7 @@ body::before{
       </div>
     </a>
 
-    <!-- Card 2: Paper Moisture -->
-    <a class="tool-card" href="paper-moisture/index.html">
-      <div class="card-stripe violet"></div>
-      <div class="card-body">
-        <div class="card-icon-wrap violet">
-          <svg class="card-icon violet" viewBox="0 0 24 24">
-            <path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z"/>
-            <line x1="7" y1="9" x2="17" y2="9"/><line x1="7" y1="13" x2="17" y2="13"/><line x1="7" y1="17" x2="12" y2="17"/>
-          </svg>
-        </div>
-        <div class="card-tag violet">Paper Analysis</div>
-        <div class="card-title">Paper Moisture (MS)</div>
-        <div class="card-desc">คำนวณความชื้นกระดาษตาม ISO 287 และ TAPPI T412 จากน้ำหนักก่อน-หลังอบ พร้อมแสดงระดับความชื้น</div>
-        <div class="card-formula">
-          <span class="card-formula-icon">∑</span>
-          <span>MC = (W<sub>initial</sub> − W<sub>final</sub>) / W<sub>initial</sub> × 100</span>
-        </div>
-        <div class="card-inputs">
-          <span class="input-chip violet">W before drying</span>
-          <span class="input-chip violet">W after drying</span>
-        </div>
-        <button class="card-btn violet" tabindex="-1">
-          Open Calculator
-          <svg class="card-arrow" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-        </button>
-      </div>
-      <div class="card-footer">
-        <span class="card-footer-meta">ISO 287 · TAPPI T412</span>
-        <div class="card-footer-dot"></div>
-      </div>
-    </a>
-
-
-    <!-- Card 3: Lab Tool Tracker -->
+    <!-- Card 2: Lab Tool Tracker -->
     <a class="tool-card" href="lab-tool-tracker/index.html">
       <div class="card-stripe teal"></div>
       <div class="card-body">
@@ -421,6 +398,38 @@ body::before{
       </div>
       <div class="card-footer">
         <span class="card-footer-meta">Multi-user · Real-time · CSV Export</span>
+        <div class="card-footer-dot"></div>
+      </div>
+    </a>
+
+    <!-- Card 3: Paper Moisture -->
+    <a class="tool-card" href="paper-moisture/index.html">
+      <div class="card-stripe violet"></div>
+      <div class="card-body">
+        <div class="card-icon-wrap violet">
+          <svg class="card-icon violet" viewBox="0 0 24 24">
+            <path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z"/>
+            <line x1="7" y1="9" x2="17" y2="9"/><line x1="7" y1="13" x2="17" y2="13"/><line x1="7" y1="17" x2="12" y2="17"/>
+          </svg>
+        </div>
+        <div class="card-tag violet">Paper Analysis</div>
+        <div class="card-title">Paper Moisture (MS)</div>
+        <div class="card-desc">คำนวณความชื้นกระดาษตาม ISO 287 และ TAPPI T412 จากน้ำหนักก่อน-หลังอบ พร้อมแสดงระดับความชื้น</div>
+        <div class="card-formula">
+          <span class="card-formula-icon">∑</span>
+          <span>MC = (W<sub>initial</sub> − W<sub>final</sub>) / W<sub>initial</sub> × 100</span>
+        </div>
+        <div class="card-inputs">
+          <span class="input-chip violet">W before drying</span>
+          <span class="input-chip violet">W after drying</span>
+        </div>
+        <button class="card-btn violet" tabindex="-1">
+          Open Calculator
+          <svg class="card-arrow" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+      <div class="card-footer">
+        <span class="card-footer-meta">ISO 287 · TAPPI T412</span>
         <div class="card-footer-dot"></div>
       </div>
     </a>
