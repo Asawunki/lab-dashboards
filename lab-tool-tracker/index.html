@@ -562,13 +562,13 @@ const SUBSTANCES = [
 const BA017_MENUS = [
   {
     id: 'soy_milk', label: 'นมถั่วเหลือง',
-    hasCount: true, countRange: [1, 7],
+    hasCount: true, countRange: [1, 8],
     items: [
-      { id: 's1', label: 'Acidity',     detail: 'นมถั่วเหลือง 20g' },
-      { id: 's2', label: 'Protein',     detail: 'นมถั่วเหลือง 3g'  },
-      { id: 's3', label: 'Fat',         detail: 'นมถั่วเหลือง 10g' },
-      { id: 's4', label: 'TS',          detail: 'นมถั่วเหลือง 3g'  },
-      { id: 's5', label: 'Beaker เปล่า', detail: '' },
+      { id: 's1', label: 'Acidity', detail: 'นมถั่วเหลือง 20g', group: 'a' },
+      { id: 's2', label: 'Protein', detail: 'นมถั่วเหลือง 3g',  group: 'a' },
+      { id: 's3', label: 'Fat',     detail: 'นมถั่วเหลือง 10g', group: 'b' },
+      { id: 's4', label: 'TS',      detail: 'นมถั่วเหลือง 3g',  group: 'b' },
+      { id: 's5', label: 'Beaker เปล่า', detail: '',            group: 'b' },
     ],
   },
   {
@@ -888,17 +888,25 @@ function renderSubPills017() {
   var menu = BA017_MENUS.find(function(m) { return m.id === selectedMenu017; });
   if (!menu) return;
 
-  // For RM menu: group visual separator
+  // Count active items per group (for green multi highlight)
+  var groupCounts = {};
+  selectedSubItems017.forEach(function(sid) {
+    var si = menu.items.find(function(x) { return x.id === sid; });
+    if (si && si.group) groupCounts[si.group] = (groupCounts[si.group] || 0) + 1;
+  });
+
   var lastGroup = null;
   container.innerHTML = menu.items.map(function(item) {
     var isActive = selectedSubItems017.indexOf(item.id) !== -1;
+    var isMulti  = isActive && item.group && (groupCounts[item.group] || 0) > 1;
     var groupHint = '';
     if (item.group && item.group !== lastGroup) {
-      if (lastGroup !== null) groupHint = '<div style="width:100%;height:0;margin:3px 0"></div>';
+      if (lastGroup !== null) groupHint = '<div style="width:100%;flex-basis:100%;height:0;margin:2px 0"></div>';
       lastGroup = item.group;
     }
+    var cls = 'subst-pill' + (isActive ? ' active' : '') + (isMulti ? ' multi' : '');
     var label = item.label + (item.detail ? ' <span class="subst-sub">' + item.detail + '</span>' : '');
-    return groupHint + '<div class="subst-pill' + (isActive ? ' active' : '') + '" onclick="toggleSubItem017(\'' + item.id + '\')">' + label + '</div>';
+    return groupHint + '<div class="' + cls + '" onclick="toggleSubItem017(\'' + item.id + '\')">' + label + '</div>';
   }).join('');
 }
 
