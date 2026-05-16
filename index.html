@@ -280,6 +280,7 @@ body::before{
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 .tool-card:nth-child(1){animation:fadeUp .5s .1s ease both}
 .tool-card:nth-child(2){animation:fadeUp .5s .22s ease both}
+.tool-card:nth-child(3){animation:fadeUp .5s .34s ease both}
 </style>
 </head>
 <body>
@@ -308,7 +309,7 @@ body::before{
     <p class="main-sub">เครื่องมือคำนวณความชื้นและของแข็งสำหรับห้องปฏิบัติการ · Select a calculator to begin</p>
 
     <div class="stats-bar">
-      <div class="stat"><div class="stat-num">2</div><div class="stat-lbl">Calculators</div></div>
+      <div class="stat"><div class="stat-num">3</div><div class="stat-lbl">Tools</div></div>
       <div class="stat"><div class="stat-num">100%</div><div class="stat-lbl">Browser-based</div></div>
       <div class="stat"><div class="stat-num">ISO</div><div class="stat-lbl">Referenced</div></div>
     </div>
@@ -317,7 +318,7 @@ body::before{
   <!-- ── Tools ── -->
   <div class="section-head">
     <div class="section-head-line"></div>
-    <div class="section-head-text">Available Calculators</div>
+    <div class="section-head-text">Available Tools</div>
     <div class="section-head-line"></div>
   </div>
 
@@ -389,6 +390,41 @@ body::before{
       </div>
     </a>
 
+
+    <!-- Card 3: Lab Tool Tracker -->
+    <a class="tool-card" href="lab-tool-tracker/index.html">
+      <div class="card-stripe teal"></div>
+      <div class="card-body">
+        <div class="card-icon-wrap teal">
+          <svg class="card-icon teal" viewBox="0 0 24 24">
+            <path d="M9 3v8l-4 6h14l-4-6V3"/>
+            <line x1="9" y1="3" x2="15" y2="3"/>
+          </svg>
+        </div>
+        <div class="card-tag teal">Tool Tracker</div>
+        <div class="card-title">Lab Tool Tracker</div>
+        <div class="card-desc">บันทึกและติดตามการใช้งานเครื่องมือแล็บ — เลือกเครื่องมือ, บันทึกเวลาเริ่มต้น, แล้วสิ้นสุดเมื่อเสร็จงาน รองรับหลายผู้ใช้</div>
+        <div class="card-formula">
+          <span class="card-formula-icon">⏱</span>
+          <span>Duration = End Time − Start Time</span>
+        </div>
+        <div class="card-inputs">
+          <span class="input-chip teal">Balance</span>
+          <span class="input-chip teal">Digester</span>
+          <span class="input-chip teal">Distillation</span>
+          <span class="input-chip teal">Shaker · pH Meter</span>
+        </div>
+        <button class="card-btn teal" tabindex="-1">
+          Open Tracker
+          <svg class="card-arrow" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+      <div class="card-footer">
+        <span class="card-footer-meta">Multi-user · Real-time · CSV Export</span>
+        <div class="card-footer-dot"></div>
+      </div>
+    </a>
+
   </div>
 
   <!-- ── Info panel ── -->
@@ -413,8 +449,8 @@ body::before{
   <!-- ── Footer ── -->
   <div class="footer">
     <div class="footer-divider"></div>
-    <span>Laboratory Calculators Hub · Browser-based · No data sent</span>
-    <span>Moisture Content · Total Solid · Paper Analysis</span>
+    <span>Laboratory Tools Hub · Browser-based · No data sent</span>
+    <span>Moisture Content · Total Solid · Paper Analysis · Tool Tracking</span>
   </div>
 
 </div>
