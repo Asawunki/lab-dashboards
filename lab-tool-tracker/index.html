@@ -457,9 +457,7 @@
           <div id="substance-pills" class="subst-pills"></div>
           <div id="count-section" style="display:none;margin-top:.6rem">
             <span class="form-label">จำนวนตัวอย่าง</span>
-            <button type="button" class="btn btn-primary" style="width:auto;padding:.65rem 1.2rem;font-size:.9rem" onclick="openCountModalBA020()">
-              <span id="count-display">เลือก</span>
-            </button>
+            <div id="count-inner"></div>
           </div>
         </div>
 
@@ -482,9 +480,7 @@
             <div id="sub-017-pills" class="subst-pills"></div>
             <div id="count-017-section" style="display:none;margin-top:.6rem">
               <span class="form-label">จำนวนตัวอย่าง</span>
-              <button type="button" class="btn btn-primary" style="width:auto;padding:.65rem 1.2rem;font-size:.9rem" onclick="openCountModalBA017()">
-                <span id="count-017-display">เลือก</span>
-              </button>
+              <div id="count-017-inner"></div>
             </div>
           </div>
         </div>
@@ -700,10 +696,10 @@ let filterMode = 'today';
 let filterDateVal = new Date().toLocaleDateString('en-CA');
 let filterCat = '';
 let selectedSubstances = [];
-let substanceCount = null;
+let substanceCounts = {};
 let selectedMenu017 = null;
 let selectedSubItems017 = [];
-let substanceCount017 = null;
+let substanceCounts017 = {};
 let selectedFlatItems = [];
 let flatCount = null;
 let flatCounts = {};
@@ -847,9 +843,9 @@ function updateSubstanceSection() {
   if (!el) return;
   var show = selectedTools.indexOf(SUBSTANCE_TOOL) !== -1;
   el.style.display = show ? 'block' : 'none';
-  if (!show) { selectedSubstances = []; substanceCount = null; }
+  if (!show) { selectedSubstances = []; substanceCounts = {}; }
   renderSubstancePills();
-  renderCountSection();
+  renderCountSectionBA020();
 }
 
 function renderSubstancePills() {
@@ -874,20 +870,31 @@ function toggleSubstance(id) {
     if (idx === -1) selectedSubstances.push(id);
     else selectedSubstances.splice(idx, 1);
   }
-  substanceCount = null;
+  substanceCounts = {};
   renderSubstancePills();
-  renderCountSection();
+  renderCountSectionBA020();
 }
 
-function renderCountSection() {
-  var el = document.getElementById('count-section');
-  if (!el) return;
-  var show = selectedSubstances.length > 0;
-  el.style.display = show ? 'block' : 'none';
-  if (show) {
-    var displayText = substanceCount ? substanceCount + ' ตัวอย่าง' : 'เลือก';
-    document.getElementById('count-display').textContent = displayText;
-  }
+function renderCountSectionBA020() {
+  var cntSec = document.getElementById('count-section');
+  var inner  = document.getElementById('count-inner');
+  if (!cntSec || !inner) return;
+  if (selectedSubstances.length === 0) { cntSec.style.display = 'none'; return; }
+  cntSec.style.display = 'block';
+  inner.innerHTML = selectedSubstances.map(function(id) {
+    var s = SUBSTANCES.find(function(x) { return x.id === id; });
+    if (!s) return '';
+    var cnt = substanceCounts[id];
+    var min = s.group === 'bio' ? 1 : 2;
+    var max = s.group === 'bio' ? 6 : 20;
+    var label = s.label + (s.sub ? ' <span style="font-size:.8em;opacity:.7">' + s.sub + '</span>' : '');
+    return '<div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.35rem">'
+      + '<span style="font-size:.8rem;font-weight:600;color:#2563eb;min-width:130px">' + label + '</span>'
+      + '<button type="button" class="btn btn-primary" style="width:auto;padding:.55rem 1rem;font-size:.85rem"'
+      + ' onclick="openCountModalBA020(\'' + id + '\',' + min + ',' + max + ')">'
+      + (cnt ? cnt + ' ตัวอย่าง' : 'เลือก') + '</button>'
+      + '</div>';
+  }).join('');
 }
 
 function openCountModal(min, max, onSelect) {
@@ -909,21 +916,19 @@ function setSubstanceCount(n) {
   closeCountModal();
 }
 
-function openCountModalBA020() {
-  var hasBio = selectedSubstances.indexOf('soy') !== -1;
-  openCountModal(hasBio ? 1 : 2, hasBio ? 6 : 20, function(n) {
-    substanceCount = n;
-    renderCountSection();
+function openCountModalBA020(substId, min, max) {
+  openCountModal(min, max, function(n) {
+    substanceCounts[substId] = n;
+    renderCountSectionBA020();
   });
 }
 
-function openCountModalBA017() {
+function openCountModalBA017(itemId) {
   var menu = BA017_MENUS.find(function(m) { return m.id === selectedMenu017; });
   if (!menu || !menu.hasCount) return;
   openCountModal(menu.countRange[0], menu.countRange[1], function(n) {
-    substanceCount017 = n;
-    var el = document.getElementById('count-017-display');
-    if (el) el.textContent = n + ' ตัวอย่าง';
+    substanceCounts017[itemId] = n;
+    renderCountSection017();
   });
 }
 
@@ -934,7 +939,7 @@ function updateBA017Section() {
   if (!el) return;
   var show = MENU_TOOLS.some(function(tool) { return selectedTools.indexOf(tool) !== -1; });
   el.style.display = show ? 'block' : 'none';
-  if (!show) { selectedMenu017 = null; selectedSubItems017 = []; substanceCount017 = null; }
+  if (!show) { selectedMenu017 = null; selectedSubItems017 = []; substanceCounts017 = {}; }
   renderMenuPills017();
 }
 
@@ -952,8 +957,7 @@ function selectMenu017(id) {
   if (selectedMenu017 === id) return;
   selectedMenu017 = id;
   selectedSubItems017 = [];
-  var menu = BA017_MENUS.find(function(m) { return m.id === id; });
-  substanceCount017 = menu && !menu.hasCount ? 1 : null;
+  substanceCounts017 = {};
   renderMenuPills017();
 }
 
@@ -968,9 +972,27 @@ function renderSubSection017() {
   if (cntSec) {
     var showCount = menu && menu.hasCount && selectedSubItems017.length > 0;
     cntSec.style.display = showCount ? 'block' : 'none';
-    var dispEl = document.getElementById('count-017-display');
-    if (dispEl) dispEl.textContent = substanceCount017 ? substanceCount017 + ' ตัวอย่าง' : 'เลือก';
+    if (showCount) renderCountSection017();
   }
+}
+
+function renderCountSection017() {
+  var inner = document.getElementById('count-017-inner');
+  if (!inner) return;
+  var menu = BA017_MENUS.find(function(m) { return m.id === selectedMenu017; });
+  if (!menu || !menu.hasCount) return;
+  inner.innerHTML = selectedSubItems017.map(function(id) {
+    var item = menu.items.find(function(x) { return x.id === id; });
+    if (!item) return '';
+    var cnt = substanceCounts017[id];
+    var label = item.label + (item.detail ? ' <span style="font-size:.8em;opacity:.7">' + item.detail + '</span>' : '');
+    return '<div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.35rem">'
+      + '<span style="font-size:.8rem;font-weight:600;color:#2563eb;min-width:130px">' + label + '</span>'
+      + '<button type="button" class="btn btn-primary" style="width:auto;padding:.55rem 1rem;font-size:.85rem"'
+      + ' onclick="openCountModalBA017(\'' + id + '\')">'
+      + (cnt ? cnt + ' ตัวอย่าง' : 'เลือก') + '</button>'
+      + '</div>';
+  }).join('');
 }
 
 function renderSubPills017() {
@@ -1027,8 +1049,7 @@ function toggleSubItem017(id) {
     if (idx === -1) selectedSubItems017.push(id);
     else selectedSubItems017.splice(idx, 1);
   }
-  // Only reset count if menu requires count selection
-  if (menu.hasCount) substanceCount017 = null;
+  if (menu.hasCount) substanceCounts017 = {};
   renderSubPills017();
   renderSubSection017();
 }
@@ -1123,16 +1144,17 @@ async function startSession() {
       msgEl.innerHTML = '<div class="msg msg-error">กรุณาเลือกสารที่ชั่ง</div>';
       return;
     }
-    if (!substanceCount) {
-      msgEl.innerHTML = '<div class="msg msg-error">กรุณาเลือกจำนวนตัวอย่าง</div>';
+    var missingSub = selectedSubstances.find(function(id) { return !substanceCounts[id]; });
+    if (missingSub) {
+      var ms = SUBSTANCES.find(function(x) { return x.id === missingSub; });
+      msgEl.innerHTML = '<div class="msg msg-error">กรุณาเลือกจำนวนตัวอย่างของ ' + (ms ? ms.label : missingSub) + '</div>';
       return;
     }
-    var substLabels = selectedSubstances.map(function(id) {
+    var substParts = selectedSubstances.map(function(id) {
       var s = SUBSTANCES.find(function(x) { return x.id === id; });
-      return s ? s.label + (s.sub ? ' ' + s.sub : '') : id;
-    }).join(' + ');
-    var substPrefix = '[' + substLabels + ' × ' + substanceCount + ' ตัวอย่าง]';
-    notes = substPrefix + (notes ? ' ' + notes : '');
+      return (s ? s.label + (s.sub ? ' ' + s.sub : '') : id) + ' × ' + substanceCounts[id];
+    }).join(' / ');
+    notes = '[' + substParts + ' ตัวอย่าง]' + (notes ? ' ' + notes : '');
   }
 
   // Validate substance selection for BA-LAB-017/014 (multi-menu tools)
@@ -1145,16 +1167,22 @@ async function startSession() {
       msgEl.innerHTML = '<div class="msg msg-error">กรุณาเลือกรายการที่ชั่ง</div>';
       return;
     }
-    if (!substanceCount017) {
-      msgEl.innerHTML = '<div class="msg msg-error">กรุณาเลือกจำนวนตัวอย่าง</div>';
-      return;
-    }
     var menu017 = BA017_MENUS.find(function(m) { return m.id === selectedMenu017; });
-    var itemLabels017 = selectedSubItems017.map(function(id) {
+    if (menu017 && menu017.hasCount) {
+      var missingItem = selectedSubItems017.find(function(id) { return !substanceCounts017[id]; });
+      if (missingItem) {
+        var mi = menu017.items.find(function(x) { return x.id === missingItem; });
+        msgEl.innerHTML = '<div class="msg msg-error">กรุณาเลือกจำนวนตัวอย่างของ ' + (mi ? mi.label : missingItem) + '</div>';
+        return;
+      }
+    }
+    var itemParts017 = selectedSubItems017.map(function(id) {
       var item = menu017 ? menu017.items.find(function(x) { return x.id === id; }) : null;
-      return item ? item.label + (item.detail ? ' ' + item.detail : '') : id;
-    }).join(' + ');
-    var prefix017 = '[' + itemLabels017 + ' × ' + substanceCount017 + ' ตัวอย่าง]';
+      var label = item ? item.label + (item.detail ? ' ' + item.detail : '') : id;
+      return menu017 && menu017.hasCount ? label + ' × ' + substanceCounts017[id] : label;
+    });
+    var sep017 = menu017 && menu017.hasCount ? ' / ' : ' + ';
+    var prefix017 = '[' + itemParts017.join(sep017) + (menu017 && menu017.hasCount ? ' ตัวอย่าง' : '') + ']';
     notes = prefix017 + (notes ? ' ' + notes : '');
   }
 
@@ -1228,9 +1256,9 @@ async function startSession() {
   res.data.forEach(function(r) { allRecords.unshift(r); });
   document.getElementById('inp-notes').value  = '';
   document.getElementById('inp-start').value  = '';
-  selectedSubstances = []; substanceCount = null;
-  renderSubstancePills(); renderCountSection();
-  selectedMenu017 = null; selectedSubItems017 = []; substanceCount017 = null;
+  selectedSubstances = []; substanceCounts = {};
+  renderSubstancePills(); renderCountSectionBA020();
+  selectedMenu017 = null; selectedSubItems017 = []; substanceCounts017 = {};
   renderMenuPills017();
   selectedFlatItems = []; flatCount = null; flatCounts = {};
   renderFlatPills();
