@@ -696,7 +696,7 @@ let filterMode = 'today';
 let filterDateVal = new Date().toLocaleDateString('en-CA');
 let filterCat = '';
 let selectedSubstances = [];
-let substanceCounts = {};
+let substanceCount = null;
 let selectedMenu017 = null;
 let selectedSubItems017 = [];
 let substanceCounts017 = {};
@@ -843,9 +843,9 @@ function updateSubstanceSection() {
   if (!el) return;
   var show = selectedTools.indexOf(SUBSTANCE_TOOL) !== -1;
   el.style.display = show ? 'block' : 'none';
-  if (!show) { selectedSubstances = []; substanceCounts = {}; }
+  if (!show) { selectedSubstances = []; substanceCount = null; }
   renderSubstancePills();
-  renderCountSectionBA020();
+  renderCountSection();
 }
 
 function renderSubstancePills() {
@@ -870,31 +870,20 @@ function toggleSubstance(id) {
     if (idx === -1) selectedSubstances.push(id);
     else selectedSubstances.splice(idx, 1);
   }
-  substanceCounts = {};
+  substanceCount = null;
   renderSubstancePills();
-  renderCountSectionBA020();
+  renderCountSection();
 }
 
-function renderCountSectionBA020() {
+function renderCountSection() {
   var cntSec = document.getElementById('count-section');
   var inner  = document.getElementById('count-inner');
   if (!cntSec || !inner) return;
   if (selectedSubstances.length === 0) { cntSec.style.display = 'none'; return; }
   cntSec.style.display = 'block';
-  inner.innerHTML = selectedSubstances.map(function(id) {
-    var s = SUBSTANCES.find(function(x) { return x.id === id; });
-    if (!s) return '';
-    var cnt = substanceCounts[id];
-    var min = s.group === 'bio' ? 1 : 2;
-    var max = s.group === 'bio' ? 6 : 20;
-    var label = s.label + (s.sub ? ' <span style="font-size:.8em;opacity:.7">' + s.sub + '</span>' : '');
-    return '<div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.35rem">'
-      + '<span style="font-size:.8rem;font-weight:600;color:#2563eb;min-width:130px">' + label + '</span>'
-      + '<button type="button" class="btn btn-primary" style="width:auto;padding:.55rem 1rem;font-size:.85rem"'
-      + ' onclick="openCountModalBA020(\'' + id + '\',' + min + ',' + max + ')">'
-      + (cnt ? cnt + ' ตัวอย่าง' : 'เลือก') + '</button>'
-      + '</div>';
-  }).join('');
+  var displayText = substanceCount ? substanceCount + ' ตัวอย่าง' : 'เลือก';
+  inner.innerHTML = '<button type="button" class="btn btn-primary" style="width:auto;padding:.65rem 1.2rem;font-size:.9rem" onclick="openCountModalBA020()">'
+    + displayText + '</button>';
 }
 
 function openCountModal(min, max, onSelect) {
@@ -916,10 +905,11 @@ function setSubstanceCount(n) {
   closeCountModal();
 }
 
-function openCountModalBA020(substId, min, max) {
-  openCountModal(min, max, function(n) {
-    substanceCounts[substId] = n;
-    renderCountSectionBA020();
+function openCountModalBA020() {
+  var hasBio = selectedSubstances.indexOf('soy') !== -1;
+  openCountModal(hasBio ? 1 : 2, hasBio ? 6 : 20, function(n) {
+    substanceCount = n;
+    renderCountSection();
   });
 }
 
@@ -1144,17 +1134,16 @@ async function startSession() {
       msgEl.innerHTML = '<div class="msg msg-error">กรุณาเลือกสารที่ชั่ง</div>';
       return;
     }
-    var missingSub = selectedSubstances.find(function(id) { return !substanceCounts[id]; });
-    if (missingSub) {
-      var ms = SUBSTANCES.find(function(x) { return x.id === missingSub; });
-      msgEl.innerHTML = '<div class="msg msg-error">กรุณาเลือกจำนวนตัวอย่างของ ' + (ms ? ms.label : missingSub) + '</div>';
+    if (!substanceCount) {
+      msgEl.innerHTML = '<div class="msg msg-error">กรุณาเลือกจำนวนตัวอย่าง</div>';
       return;
     }
-    var substParts = selectedSubstances.map(function(id) {
+    var substLabels = selectedSubstances.map(function(id) {
       var s = SUBSTANCES.find(function(x) { return x.id === id; });
-      return (s ? s.label + (s.sub ? ' ' + s.sub : '') : id) + ' × ' + substanceCounts[id];
-    }).join(' / ');
-    notes = '[' + substParts + ' ตัวอย่าง]' + (notes ? ' ' + notes : '');
+      return s ? s.label + (s.sub ? ' ' + s.sub : '') : id;
+    }).join(' + ');
+    var substPrefix = '[' + substLabels + ' × ' + substanceCount + ' ตัวอย่าง]';
+    notes = substPrefix + (notes ? ' ' + notes : '');
   }
 
   // Validate substance selection for BA-LAB-017/014 (multi-menu tools)
@@ -1216,8 +1205,9 @@ async function startSession() {
 
   var startDT = new Date(dateVal + 'T' + startVal);
 
-  // Check if any selected tool already has an active record
+  // Check if any selected tool already has an active record (except BA-LAB-017/014 which allow concurrent use)
   var alreadyActive = selectedTools.filter(function(tool) {
+    if (MENU_TOOLS.indexOf(tool) !== -1) return false; // BA-LAB-017/014 allow concurrent
     return allRecords.some(function(r) { return r.tool_id === tool && !r.end_time; });
   });
   if (alreadyActive.length > 0) {
@@ -1256,8 +1246,8 @@ async function startSession() {
   res.data.forEach(function(r) { allRecords.unshift(r); });
   document.getElementById('inp-notes').value  = '';
   document.getElementById('inp-start').value  = '';
-  selectedSubstances = []; substanceCounts = {};
-  renderSubstancePills(); renderCountSectionBA020();
+  selectedSubstances = []; substanceCount = null;
+  renderSubstancePills(); renderCountSection();
   selectedMenu017 = null; selectedSubItems017 = []; substanceCounts017 = {};
   renderMenuPills017();
   selectedFlatItems = []; flatCount = null; flatCounts = {};
