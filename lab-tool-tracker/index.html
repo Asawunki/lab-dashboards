@@ -553,7 +553,7 @@ const TOOLS = {
 };
 const MULTI_SELECT_CATS = {'Shaker': true};
 const SUBSTANCE_TOOL = 'BA-LAB-020';
-const SUBSTANCE_TOOL_017 = 'BA-LAB-017';
+const MENU_TOOLS = ['BA-LAB-017', 'BA-LAB-014'];
 const SUBSTANCES = [
   { id:'cuso4', label:'CuSO₄·5H₂O', sub:'0.5 g', group:'chem' },
   { id:'k2so4', label:'K₂SO₄',            sub:'10 g',  group:'chem' },
@@ -562,7 +562,7 @@ const SUBSTANCES = [
 const BA017_MENUS = [
   {
     id: 'soy_milk', label: 'นมถั่วเหลือง',
-    countRange: [1, 7],
+    hasCount: true, countRange: [1, 7],
     items: [
       { id: 's1', label: 'Acidity',     detail: 'นมถั่วเหลือง 20g' },
       { id: 's2', label: 'Protein',     detail: 'นมถั่วเหลือง 3g'  },
@@ -573,7 +573,7 @@ const BA017_MENUS = [
   },
   {
     id: 'rm', label: 'ตัวอย่าง RM',
-    countRange: [1, 10],
+    hasCount: true, countRange: [1, 10],
     items: [
       { id: 'r1', label: 'MS กากถั่วเหลือง',      detail: '',    group: 'g1' },
       { id: 'r2', label: 'Protein กากถั่วเหลือง', detail: '1g',  group: 'g1' },
@@ -586,10 +586,19 @@ const BA017_MENUS = [
   },
   {
     id: 'post', label: 'TS, Fat หลังอบ',
-    countRange: [1, 10],
+    hasCount: true, countRange: [1, 10],
     items: [
       { id: 'p1', label: 'TS นมถั่วเหลืองหลังอบ', detail: '' },
       { id: 'p2', label: 'Beaker Fat',             detail: '' },
+    ],
+  },
+  {
+    id: 'chem', label: 'สารเคมี',
+    hasCount: false,
+    items: [
+      { id: 'c1', label: 'Ammonium sulfate',                      detail: '0.12g' },
+      { id: 'c2', label: 'Ammonium sulfate + Sucrose',            detail: '0.12g + 0.85g' },
+      { id: 'c3', label: 'Ammonium sulfate + L-Tryptophan',       detail: '0.12g + 0.67g' },
     ],
   },
 ];
@@ -819,7 +828,7 @@ function openCountModalBA020() {
 
 function openCountModalBA017() {
   var menu = BA017_MENUS.find(function(m) { return m.id === selectedMenu017; });
-  if (!menu) return;
+  if (!menu || !menu.hasCount) return;
   openCountModal(menu.countRange[0], menu.countRange[1], function(n) {
     substanceCount017 = n;
     var el = document.getElementById('count-017-display');
@@ -832,7 +841,7 @@ function openCountModalBA017() {
 function updateBA017Section() {
   var el = document.getElementById('substance-017-section');
   if (!el) return;
-  var show = selectedTools.indexOf(SUBSTANCE_TOOL_017) !== -1;
+  var show = MENU_TOOLS.some(function(tool) { return selectedTools.indexOf(tool) !== -1; });
   el.style.display = show ? 'block' : 'none';
   if (!show) { selectedMenu017 = null; selectedSubItems017 = []; substanceCount017 = null; }
   renderMenuPills017();
@@ -852,7 +861,8 @@ function selectMenu017(id) {
   if (selectedMenu017 === id) return;
   selectedMenu017 = id;
   selectedSubItems017 = [];
-  substanceCount017 = null;
+  var menu = BA017_MENUS.find(function(m) { return m.id === id; });
+  substanceCount017 = menu && !menu.hasCount ? 1 : null;
   renderMenuPills017();
 }
 
@@ -863,8 +873,10 @@ function renderSubSection017() {
   if (!selectedMenu017) { subSec.style.display = 'none'; return; }
   subSec.style.display = 'block';
   renderSubPills017();
+  var menu = BA017_MENUS.find(function(m) { return m.id === selectedMenu017; });
   if (cntSec) {
-    cntSec.style.display = selectedSubItems017.length > 0 ? 'block' : 'none';
+    var showCount = menu && menu.hasCount && selectedSubItems017.length > 0;
+    cntSec.style.display = showCount ? 'block' : 'none';
     var dispEl = document.getElementById('count-017-display');
     if (dispEl) dispEl.textContent = substanceCount017 ? substanceCount017 + ' ตัวอย่าง' : 'เลือก';
   }
@@ -952,8 +964,8 @@ async function startSession() {
     notes = substPrefix + (notes ? ' ' + notes : '');
   }
 
-  // Validate substance selection for BA-LAB-017
-  if (selectedTools.indexOf(SUBSTANCE_TOOL_017) !== -1) {
+  // Validate substance selection for BA-LAB-017/014 (multi-menu tools)
+  if (MENU_TOOLS.some(function(tool) { return selectedTools.indexOf(tool) !== -1; })) {
     if (!selectedMenu017) {
       msgEl.innerHTML = '<div class="msg msg-error">กรุณาเลือกหมวดตัวอย่าง</div>';
       return;
