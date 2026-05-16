@@ -895,8 +895,10 @@ function renderCountSection() {
     + displayText + '</button>';
 }
 
-function openCountModal(min, max, onSelect) {
+function openCountModal(min, max, label, onSelect) {
   _countModalOnSelect = onSelect;
+  var title = 'เลือกจำนวนตัวอย่าง' + (label ? ' ' + label : '');
+  document.querySelector('#count-modal .modal-title').textContent = title;
   var pills = '';
   for (var i = min; i <= max; i++) {
     pills += '<div class="count-pill" onclick="setSubstanceCount(' + i + ')">' + i + '</div>';
@@ -916,7 +918,11 @@ function setSubstanceCount(n) {
 
 function openCountModalBA020() {
   var hasBio = selectedSubstances.indexOf('soy') !== -1;
-  openCountModal(hasBio ? 1 : 2, hasBio ? 6 : 20, function(n) {
+  var label = hasBio ? 'นมถั่วเหลือง' : selectedSubstances.map(function(id) {
+    var s = SUBSTANCES.find(function(x) { return x.id === id; });
+    return s ? s.label : id;
+  }).join(', ');
+  openCountModal(hasBio ? 1 : 2, hasBio ? 6 : 20, label, function(n) {
     substanceCount = n;
     renderCountSection();
   });
@@ -925,7 +931,9 @@ function openCountModalBA020() {
 function openCountModalBA017(itemId) {
   var menu = BA017_MENUS.find(function(m) { return m.id === selectedMenu017; });
   if (!menu || !menu.hasCount) return;
-  openCountModal(menu.countRange[0], menu.countRange[1], function(n) {
+  var item = menu.items.find(function(x) { return x.id === itemId; });
+  var label = item ? item.label : '';
+  openCountModal(menu.countRange[0], menu.countRange[1], label, function(n) {
     substanceCounts017[itemId] = n;
     renderCountSection017();
   });
@@ -1135,11 +1143,17 @@ function openCountModalFlat(tool) {
   var cfg = FLAT_CAT_CONFIG[selectedCat];
   if (!cfg) return;
   var min = cfg.countRange[0], max = cfg.countRange[1];
+  var label = '';
   if (isPerItemCountMode() && tool) {
     var item = cfg.items.find(function(x) { return x.id === tool; });
-    if (item && item.countRange) { min = item.countRange[0]; max = item.countRange[1]; }
+    if (item) {
+      label = item.label;
+      if (item.countRange) { min = item.countRange[0]; max = item.countRange[1]; }
+    }
+  } else if (isPerToolCountMode() && tool) {
+    label = tool;
   }
-  openCountModal(min, max, function(n) {
+  openCountModal(min, max, label, function(n) {
     if (tool) { flatCounts[tool] = n; } else { flatCount = n; }
     renderFlatCountSection();
   });
