@@ -320,6 +320,37 @@
 
     .footer{text-align:center;padding:1.25rem 0 1.5rem}
     .footer-text{font-size:10px;color:#b0bfcc;letter-spacing:.5px}
+
+    /* ── Substance & Count pills ── */
+    .subst-pills{display:flex;flex-wrap:wrap;gap:6px}
+    .subst-pill{
+      padding:6px 13px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;
+      border:1px solid #d0dcea;background:#f4f7fb;color:#7a90aa;transition:all .2s;
+      display:flex;align-items:center;gap:5px;
+    }
+    .subst-pill:hover{border-color:#93c5fd;color:#2563eb;background:#eff6ff}
+    .subst-pill.active{
+      background:linear-gradient(135deg,#2563eb,#0ea5e9);
+      border-color:transparent;color:#fff;
+      box-shadow:0 2px 8px rgba(37,99,235,.22);
+    }
+    .subst-pill.active.multi{
+      background:linear-gradient(135deg,#059669,#10b981);
+      box-shadow:0 2px 8px rgba(5,150,105,.22);
+    }
+    .subst-sub{font-size:.85em;opacity:.78;font-family:'JetBrains Mono',monospace}
+    .count-pills{display:flex;flex-wrap:wrap;gap:5px}
+    .count-pill{
+      padding:5px 0;width:36px;text-align:center;
+      border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;
+      border:1px solid #d0dcea;background:#f4f7fb;color:#7a90aa;transition:all .2s;
+    }
+    .count-pill:hover{border-color:#93c5fd;color:#2563eb;background:#eff6ff}
+    .count-pill.active{
+      background:linear-gradient(135deg,#2563eb,#0ea5e9);
+      border-color:transparent;color:#fff;
+      box-shadow:0 2px 8px rgba(37,99,235,.22);
+    }
   </style>
 </head>
 <body>
@@ -405,6 +436,16 @@
           <div id="multi-hint" class="multi-hint" style="display:none">กด Ctrl/⌘ หรือแตะหลายครั้งเพื่อเลือกหลายเครื่อง</div>
         </div>
 
+        <!-- Substance section — only for BA-LAB-020 -->
+        <div id="substance-section" style="display:none;margin-bottom:.75rem">
+          <span class="form-label">สารที่ชั่ง</span>
+          <div id="substance-pills" class="subst-pills"></div>
+          <div id="count-section" style="display:none;margin-top:.6rem">
+            <span class="form-label" style="margin-top:.5rem;display:block">จำนวนตัวอย่าง</span>
+            <div id="count-pills" class="count-pills"></div>
+          </div>
+        </div>
+
         <div class="row2">
           <div>
             <span class="form-label">วันที่</span>
@@ -481,6 +522,12 @@ const TOOLS = {
   'pH Meter':     ['PH-LAB-011','PH-LAB-010'],
 };
 const MULTI_SELECT_CATS = {'Shaker': true};
+const SUBSTANCE_TOOL = 'BA-LAB-020';
+const SUBSTANCES = [
+  { id:'cuso4', label:'CuSO₄·5H₂O', sub:'0.5 g', group:'chem' },
+  { id:'k2so4', label:'K₂SO₄',            sub:'10 g',  group:'chem' },
+  { id:'soy',   label:'นมถั่วเหลือง', sub:'', group:'bio' },
+];
 const CAT_LABELS = {
   'Balance':'เครื่องชั่ง (Balance)','Digester':'เครื่องย่อย (Digester)',
   'Distillation':'เครื่องกลั่น (Distillation)','Shaker':'เครื่องเขย่า (Shaker)',
@@ -492,6 +539,8 @@ let selectedCat = 'Balance';
 let selectedTools = ['BA-LAB-020'];
 let filterMode = 'today';
 let filterDateVal = new Date().toLocaleDateString('en-CA');
+let selectedSubstances = [];
+let substanceCount = null;
 
 // Category pills
 document.querySelectorAll('.cat-pill').forEach(function(p) {
@@ -592,6 +641,7 @@ function updateToolSelect() {
   }).join('');
 
   if (hint) hint.style.display = isMulti ? 'block' : 'none';
+  updateSubstanceSection();
 }
 
 function toggleTool(tool) {
@@ -615,6 +665,70 @@ function toggleTool(tool) {
     var multiCls = isMulti && isActive && selectedTools.length > 1 ? ' multi' : '';
     return '<button type="button" class="tool-pill' + (isActive ? ' active' : '') + multiCls + '" onclick="toggleTool(\'' + t + '\')">' + t + '</button>';
   }).join('');
+  updateSubstanceSection();
+}
+
+// ── Substance Select ──────────────────────────
+
+function updateSubstanceSection() {
+  var el = document.getElementById('substance-section');
+  if (!el) return;
+  var show = selectedTools.indexOf(SUBSTANCE_TOOL) !== -1;
+  el.style.display = show ? 'block' : 'none';
+  if (!show) { selectedSubstances = []; substanceCount = null; }
+  renderSubstancePills();
+  renderCountSection();
+}
+
+function renderSubstancePills() {
+  var container = document.getElementById('substance-pills');
+  if (!container) return;
+  container.innerHTML = SUBSTANCES.map(function(s) {
+    var isActive = selectedSubstances.indexOf(s.id) !== -1;
+    var isMulti  = isActive && selectedSubstances.length > 1;
+    var cls = 'subst-pill' + (isActive ? ' active' : '') + (isMulti ? ' multi' : '');
+    return '<div class="' + cls + '" onclick="toggleSubstance(\'' + s.id + '\')">'
+      + s.label
+      + (s.sub ? '<span class="subst-sub">' + s.sub + '</span>' : '')
+      + '</div>';
+  }).join('');
+}
+
+function toggleSubstance(id) {
+  var s = SUBSTANCES.find(function(x) { return x.id === id; });
+  if (!s) return;
+  if (s.group === 'bio') {
+    selectedSubstances = selectedSubstances.indexOf('soy') !== -1 ? [] : ['soy'];
+  } else {
+    selectedSubstances = selectedSubstances.filter(function(x) { return x !== 'soy'; });
+    var idx = selectedSubstances.indexOf(id);
+    if (idx === -1) selectedSubstances.push(id);
+    else selectedSubstances.splice(idx, 1);
+  }
+  substanceCount = null;
+  renderSubstancePills();
+  renderCountSection();
+}
+
+function renderCountSection() {
+  var el = document.getElementById('count-section');
+  if (!el) return;
+  var show = selectedSubstances.length > 0;
+  el.style.display = show ? 'block' : 'none';
+  if (!show) return;
+  var hasBio = selectedSubstances.indexOf('soy') !== -1;
+  var min = hasBio ? 1 : 2;
+  var pills = '';
+  for (var i = min; i <= 20; i++) {
+    var active = substanceCount === i;
+    pills += '<div class="count-pill' + (active ? ' active' : '') + '" onclick="setSubstanceCount(' + i + ')">' + i + '</div>';
+  }
+  document.getElementById('count-pills').innerHTML = pills;
+}
+
+function setSubstanceCount(n) {
+  substanceCount = n;
+  renderCountSection();
 }
 
 // ── Sessions ──────────────────────────────────
@@ -628,6 +742,24 @@ async function startSession() {
   if (!dateVal || !startVal) {
     msgEl.innerHTML = '<div class="msg msg-error">กรุณาเลือกวันที่และเวลาเริ่มต้น</div>';
     return;
+  }
+
+  // Validate substance selection for BA-LAB-020
+  if (selectedTools.indexOf(SUBSTANCE_TOOL) !== -1) {
+    if (selectedSubstances.length === 0) {
+      msgEl.innerHTML = '<div class="msg msg-error">กรุณาเลือกสารที่ชั่ง</div>';
+      return;
+    }
+    if (!substanceCount) {
+      msgEl.innerHTML = '<div class="msg msg-error">กรุณาเลือกจำนวนตัวอย่าง</div>';
+      return;
+    }
+    var substLabels = selectedSubstances.map(function(id) {
+      var s = SUBSTANCES.find(function(x) { return x.id === id; });
+      return s ? s.label + (s.sub ? ' ' + s.sub : '') : id;
+    }).join(' + ');
+    var substPrefix = '[' + substLabels + ' × ' + substanceCount + ' ตัวอย่าง]';
+    notes = substPrefix + (notes ? ' ' + notes : '');
   }
 
   var startDT = new Date(dateVal + 'T' + startVal);
@@ -672,6 +804,8 @@ async function startSession() {
   res.data.forEach(function(r) { allRecords.unshift(r); });
   document.getElementById('inp-notes').value  = '';
   document.getElementById('inp-start').value  = '';
+  selectedSubstances = []; substanceCount = null;
+  renderSubstancePills(); renderCountSection();
   renderActiveSessions();
   renderRecords();
 }
