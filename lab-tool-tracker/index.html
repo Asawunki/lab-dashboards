@@ -103,40 +103,37 @@
     /* ── APP ───────────────────────────────── */
     #app-screen{display:none;position:relative;z-index:1}
 
-    .topbar{
-      background:#fff;border-bottom:2px solid #93c5fd;
-      padding:1rem 1.5rem;
-      display:flex;align-items:center;justify-content:space-between;
-      position:sticky;top:0;z-index:100;
-      box-shadow:0 4px 16px rgba(37,99,235,0.08);
+    .page-header{
+      max-width:1100px;margin:0 auto;
+      padding:1.25rem 1.5rem .5rem;
+      display:flex;align-items:center;justify-content:space-between;gap:1rem;
     }
-    .topbar-brand{display:flex;align-items:center;gap:.7rem}
-    .topbar-title{font-size:1rem;font-weight:700;color:#0f172a;letter-spacing:-.2px}
-    .topbar-user{font-size:.72rem;color:#64748b;font-family:'JetBrains Mono',monospace;margin-top:.1rem}
-    .topbar-right{display:flex;gap:.6rem;align-items:center}
-    .topbar-btn{
-      padding:.42rem .95rem;background:#f8fafc;border:1.5px solid #cbd5e1;
-      color:#64748b;border-radius:22px;cursor:pointer;font-family:inherit;
-      font-size:.75rem;font-weight:600;transition:all .25s;
-      box-shadow:0 2px 6px rgba(0,0,0,0.05);
-    }
-    .topbar-btn:hover{background:#fff;border-color:#93c5fd;color:#2563eb;box-shadow:0 4px 12px rgba(37,99,235,0.1)}
-    .topbar-btn.danger{background:#fef2f2;border-color:#fca5a5;color:#dc2626}
-    .topbar-btn.danger:hover{background:#fee2e2;border-color:#f87171;color:#b91c1c;box-shadow:0 4px 12px rgba(220,38,38,0.15)}
+    .page-brand{display:flex;align-items:center;gap:.65rem;flex:1;justify-content:center}
+    .page-title{font-size:1rem;font-weight:700;color:#0f172a;letter-spacing:-.2px}
+    .page-user{font-size:.7rem;color:#64748b;font-family:'JetBrains Mono',monospace;margin-top:.1rem}
     .back-btn{
       display:inline-flex;align-items:center;gap:6px;
       background:#fff;border:1px solid #c8d9ed;border-radius:20px;
-      padding:6px 14px 6px 10px;margin-bottom:1rem;
+      padding:6px 14px 6px 10px;
       font-size:12px;font-weight:600;color:#2563eb;
-      text-decoration:none;cursor:pointer;
+      text-decoration:none;cursor:pointer;flex-shrink:0;
       box-shadow:0 1px 4px rgba(30,80,160,0.07);transition:all .2s;
     }
     .back-btn:hover{background:#eff6ff;border-color:#93c5fd;box-shadow:0 2px 8px rgba(37,99,235,0.12)}
     .back-btn svg{width:14px;height:14px;fill:none;stroke:#2563eb;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-    @media(max-width:520px){
-      .topbar{flex-wrap:wrap;row-gap:.5rem;padding:.6rem 1rem}
-      .topbar-brand{flex:1 1 100%}
-      .topbar-right{width:100%;justify-content:flex-end}
+    .logout-btn{
+      padding:.38rem .9rem;flex-shrink:0;
+      background:#fef2f2;border:1.5px solid #fca5a5;
+      color:#dc2626;border-radius:22px;cursor:pointer;
+      font-family:inherit;font-size:.75rem;font-weight:600;
+      transition:all .22s;box-shadow:0 2px 6px rgba(220,38,38,0.08);
+    }
+    .logout-btn:hover{background:#fee2e2;border-color:#f87171;color:#b91c1c;box-shadow:0 4px 12px rgba(220,38,38,0.15)}
+    @media(max-width:540px){
+      .page-header{padding:1rem .75rem .4rem;gap:.5rem}
+      .page-title{font-size:.9rem}
+      .back-btn{padding:5px 11px 5px 8px;font-size:11px}
+      .logout-btn{padding:.32rem .75rem;font-size:.72rem}
     }
 
     .main{
@@ -470,27 +467,24 @@
 
 <!-- APP -->
 <div id="app-screen">
-  <div class="topbar">
-    <div class="topbar-brand">
-      <div class="lab-icon" style="width:42px;height:42px">
-        <svg viewBox="0 0 24 24" style="width:22px;height:22px"><path d="M9 3v8l-4 6h14l-4-6V3"/><line x1="9" y1="3" x2="15" y2="3"/></svg>
-      </div>
-      <div>
-        <div class="topbar-title">Lab Tool Tracker</div>
-        <div class="topbar-user" id="user-display"></div>
-      </div>
-    </div>
-    <div class="topbar-right">
-      <button class="topbar-btn danger" onclick="handleLogout()">ออกจากระบบ</button>
-    </div>
-  </div>
-
-  <div class="main">
-
-    <a class="back-btn" href="../index.html">
+  <div class="page-header">
+    <a href="../index.html" class="back-btn">
       <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
       Lab Hub
     </a>
+    <div class="page-brand">
+      <div class="lab-icon" style="width:38px;height:38px">
+        <svg viewBox="0 0 24 24" style="width:20px;height:20px"><path d="M9 3v8l-4 6h14l-4-6V3"/><line x1="9" y1="3" x2="15" y2="3"/></svg>
+      </div>
+      <div>
+        <div class="page-title">Lab Tool Tracker</div>
+        <div class="page-user" id="user-display"></div>
+      </div>
+    </div>
+    <button class="logout-btn" onclick="handleLogout()">ออกจากระบบ</button>
+  </div>
+
+  <div class="main">
 
     <!-- LEFT column -->
     <div>
