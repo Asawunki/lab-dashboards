@@ -31,16 +31,31 @@
       position:relative;overflow-x:hidden;
     }
     body::before{
-      content:'';position:fixed;top:-100px;right:-100px;
-      width:500px;height:500px;
-      background:radial-gradient(circle,rgba(37,99,235,0.08) 0%,transparent 70%);
-      pointer-events:none;z-index:0;border-radius:50%;
+      content:'';position:fixed;inset:0;
+      background-image:
+        linear-gradient(rgba(37,99,235,.03) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(37,99,235,.03) 1px,transparent 1px);
+      background-size:44px 44px;
+      pointer-events:none;z-index:0;
     }
-    body::after{
-      content:'';position:fixed;bottom:-80px;left:-80px;
-      width:400px;height:400px;
-      background:radial-gradient(circle,rgba(37,99,235,0.06) 0%,transparent 70%);
-      pointer-events:none;z-index:0;border-radius:50%;
+    .orb{
+      position:fixed;border-radius:50%;pointer-events:none;z-index:0;
+      filter:blur(90px);opacity:.09;
+      animation:orbDrift 34s ease-in-out infinite alternate;
+    }
+    .orb1{
+      width:420px;height:420px;
+      background:radial-gradient(circle,#2563eb,transparent);
+      top:-140px;right:-100px;animation-duration:36s;
+    }
+    .orb2{
+      width:340px;height:340px;
+      background:radial-gradient(circle,#0d9488,transparent);
+      bottom:-100px;left:-80px;animation-duration:30s;animation-delay:-15s;
+    }
+    @keyframes orbDrift{
+      from{transform:translate(0,0) scale(1)}
+      to  {transform:translate(20px,25px) scale(1.06)}
     }
 
     /* ── AUTH ──────────────────────────────── */
@@ -426,6 +441,9 @@
   </style>
 </head>
 <body>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
 
 <!-- AUTH -->
 <div id="auth-screen">
