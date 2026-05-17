@@ -371,6 +371,50 @@
       border-color:transparent;color:#fff;
       box-shadow:0 2px 8px rgba(37,99,235,.22);
     }
+
+    /* ════════════════════════════
+       COMPACT MOBILE  ≤ 540px
+       ════════════════════════════ */
+    @media(max-width:540px){
+      /* Main container */
+      .main{padding:.75rem;gap:.75rem}
+
+      /* Section card */
+      .section{padding:.9rem;border-radius:12px}
+      .section+.section{margin-top:.65rem}
+
+      /* Section heading */
+      .sec-label{font-size:13px;margin-bottom:.6rem;gap:7px}
+
+      /* Form labels */
+      .form-label{font-size:.63rem;margin-bottom:.18rem}
+
+      /* Sub-section wrappers inside start-form */
+      #start-form>div{margin-bottom:.45rem!important}
+
+      /* Category / Tool / Substance pills */
+      .cat-pill,.tool-pill,.subst-pill{
+        padding:4px 9px;font-size:11.5px;border-radius:6px
+      }
+      #start-form .cat-pill,
+      #start-form .tool-pill,
+      #start-form .subst-pill{font-size:12px}
+      .cat-pills,.tool-pills,.subst-pills{gap:5px;margin-bottom:0!important}
+
+      /* Count pills */
+      .count-pill{width:42px;padding:6px 0;font-size:.95rem;border-radius:6px}
+      .count-pills{gap:4px}
+
+      /* Date / Time inputs */
+      .row2{gap:.35rem}
+      input[type=date],input[type=time]{padding:6px 8px;font-size:13px}
+
+      /* Notes textarea */
+      textarea{min-height:48px;font-size:13px;padding:6px 8px}
+
+      /* Submit / Clear buttons */
+      .btn{padding:.62rem;font-size:13.5px}
+    }
   </style>
 </head>
 <body>
