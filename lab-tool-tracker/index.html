@@ -601,8 +601,9 @@ const BA017_MENUS = [
       { id: 's1', label: 'Acidity', detail: 'นมถั่วเหลือง 20g', group: 'a' },
       { id: 's2', label: 'Protein', detail: 'นมถั่วเหลือง 3g',  group: 'a' },
       { id: 's3', label: 'Fat',     detail: 'นมถั่วเหลือง 10g', group: 'b' },
-      { id: 's4', label: 'TS',      detail: 'นมถั่วเหลือง 3g',  group: 'b' },
-      { id: 's5', label: 'Beaker เปล่า', detail: '',            group: 'b' },
+      { id: 's4', label: 'TS',         detail: 'นมถั่วเหลือง 3g', group: 'b' },
+      { id: 's6', label: 'TS Blank',   detail: '',               group: 'b', noCount: true },
+      { id: 's5', label: 'Beaker เปล่า', detail: '',             group: 'b' },
     ],
   },
   {
@@ -625,7 +626,9 @@ const BA017_MENUS = [
     hasCount: true, countRange: [1, 10],
     items: [
       { id: 'p1', label: 'TS นมถั่วเหลืองหลังอบ', detail: '', group: 'p' },
+      { id: 'p3', label: 'TS Blank',               detail: '', group: 'p', noCount: true },
       { id: 'p2', label: 'Beaker Fat',             detail: '', group: 'p' },
+      { id: 'p4', label: 'Fat Blank',              detail: '', group: 'p', noCount: true },
     ],
   },
   {
@@ -1000,7 +1003,11 @@ function renderSubSection017() {
   renderSubPills017();
   var menu = BA017_MENUS.find(function(m) { return m.id === selectedMenu017; });
   if (cntSec) {
-    var showCount = menu && menu.hasCount && selectedSubItems017.length > 0;
+    var hasCountableItems = selectedSubItems017.some(function(id) {
+      var it = menu ? menu.items.find(function(x) { return x.id === id; }) : null;
+      return it && !it.noCount;
+    });
+    var showCount = menu && menu.hasCount && hasCountableItems;
     cntSec.style.display = showCount ? 'block' : 'none';
     if (showCount) renderCountSection017();
   }
@@ -1011,7 +1018,10 @@ function renderCountSection017() {
   if (!inner) return;
   var menu = BA017_MENUS.find(function(m) { return m.id === selectedMenu017; });
   if (!menu || !menu.hasCount) return;
-  inner.innerHTML = selectedSubItems017.map(function(id) {
+  inner.innerHTML = selectedSubItems017.filter(function(id) {
+    var item = menu.items.find(function(x) { return x.id === id; });
+    return item && !item.noCount;
+  }).map(function(id) {
     var item = menu.items.find(function(x) { return x.id === id; });
     if (!item) return '';
     var cnt = substanceCounts017[id];
@@ -1253,7 +1263,10 @@ async function startSession() {
     }
     var menu017 = BA017_MENUS.find(function(m) { return m.id === selectedMenu017; });
     if (menu017 && menu017.hasCount) {
-      var missingItem = selectedSubItems017.find(function(id) { return !substanceCounts017[id]; });
+      var missingItem = selectedSubItems017.find(function(id) {
+        var it = menu017.items.find(function(x) { return x.id === id; });
+        return !(it && it.noCount) && !substanceCounts017[id];
+      });
       if (missingItem) {
         var mi = menu017.items.find(function(x) { return x.id === missingItem; });
         msgEl.innerHTML = '<div class="msg msg-error">กรุณาเลือกจำนวนตัวอย่างของ ' + (mi ? mi.label : missingItem) + '</div>';
@@ -1263,7 +1276,11 @@ async function startSession() {
     var itemParts017 = selectedSubItems017.map(function(id) {
       var item = menu017 ? menu017.items.find(function(x) { return x.id === id; }) : null;
       var label = item ? item.label + (item.detail ? ' ' + item.detail : '') : id;
-      return menu017 && menu017.hasCount ? label + ' × ' + substanceCounts017[id] : label;
+      if (menu017 && menu017.hasCount) {
+        var cnt017 = (item && item.noCount) ? 1 : substanceCounts017[id];
+        return label + ' × ' + cnt017;
+      }
+      return label;
     });
     var sep017 = menu017 && menu017.hasCount ? ' / ' : ' + ';
     var prefix017 = '[' + itemParts017.join(sep017) + (menu017 && menu017.hasCount ? ' ตัวอย่าง' : '') + ']';
@@ -1319,9 +1336,10 @@ async function startSession() {
 
   var startDT = new Date(dateVal + 'T' + startVal);
 
-  // Check if any selected tool already has an active record (except BA-LAB-017/014 which allow concurrent use)
+  // Check if any selected tool already has an active record (except BA-LAB-017/014 and pH Meter which allow concurrent use)
   var alreadyActive = selectedTools.filter(function(tool) {
-    if (MENU_TOOLS.indexOf(tool) !== -1) return false; // BA-LAB-017/014 allow concurrent
+    if (MENU_TOOLS.indexOf(tool) !== -1) return false;
+    if (selectedCat === 'pH Meter') return false;
     return allRecords.some(function(r) { return r.tool_id === tool && !r.end_time; });
   });
   if (alreadyActive.length > 0) {
