@@ -121,9 +121,20 @@
       box-shadow:0 2px 6px rgba(0,0,0,0.05);
     }
     .topbar-btn:hover{background:#fff;border-color:#93c5fd;color:#2563eb;box-shadow:0 4px 12px rgba(37,99,235,0.1)}
-    .topbar-btn.danger:hover{background:#fff5f5;border-color:#fca5a5;color:#dc2626}
+    .topbar-btn.danger{background:#fef2f2;border-color:#fca5a5;color:#dc2626}
+    .topbar-btn.danger:hover{background:#fee2e2;border-color:#f87171;color:#b91c1c;box-shadow:0 4px 12px rgba(220,38,38,0.15)}
+    .back-btn{
+      display:inline-flex;align-items:center;gap:6px;
+      background:#fff;border:1px solid #c8d9ed;border-radius:20px;
+      padding:6px 14px 6px 10px;margin-bottom:1rem;
+      font-size:12px;font-weight:600;color:#2563eb;
+      text-decoration:none;cursor:pointer;
+      box-shadow:0 1px 4px rgba(30,80,160,0.07);transition:all .2s;
+    }
+    .back-btn:hover{background:#eff6ff;border-color:#93c5fd;box-shadow:0 2px 8px rgba(37,99,235,0.12)}
+    .back-btn svg{width:14px;height:14px;fill:none;stroke:#2563eb;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
     @media(max-width:520px){
-      .topbar{flex-wrap:wrap;row-gap:.5rem;padding:.75rem 1rem}
+      .topbar{flex-wrap:wrap;row-gap:.5rem;padding:.6rem 1rem}
       .topbar-brand{flex:1 1 100%}
       .topbar-right{width:100%;justify-content:flex-end}
     }
@@ -470,12 +481,16 @@
       </div>
     </div>
     <div class="topbar-right">
-      <a href="../index.html" class="topbar-btn" style="text-decoration:none">← หน้าหลัก</a>
       <button class="topbar-btn danger" onclick="handleLogout()">ออกจากระบบ</button>
     </div>
   </div>
 
   <div class="main">
+
+    <a class="back-btn" href="../index.html">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Lab Hub
+    </a>
 
     <!-- LEFT column -->
     <div>
