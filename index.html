@@ -318,49 +318,52 @@ body::before{
   .info-panel{grid-template-columns:repeat(2,1fr)}
 }
 
-/* ── Large phone (≤ 600px) ── */
+/* ── Large phone (≤ 600px) — compact horizontal cards ── */
 @media(max-width:600px){
-  .wrap{padding:2rem 1rem 3.5rem}
-  .header{margin-bottom:2.5rem}
+  .wrap{padding:2rem 1rem 5.5rem} /* extra bottom for floating dock */
+  .header{margin-bottom:2rem}
   .main-title{letter-spacing:-1px}
-  .stats-bar{max-width:100%}
-  .stat{padding:.75rem .4rem}
-  .stat-num{font-size:20px}
-  .card-body{padding:1.4rem}
-  .card-title{font-size:18px}
-  .card-formula{font-size:10.5px;padding:7px 11px}
+  .stats-bar{display:none}         /* ซ่อน stats bar */
+
+  /* Horizontal card layout */
+  .tools-grid{gap:.75rem}
+  .tool-card{border-radius:16px}
+  .card-body{
+    display:flex;align-items:center;
+    gap:.85rem;padding:.85rem 1rem;
+  }
+  .card-icon-wrap{
+    flex-shrink:0;
+    width:44px;height:44px;
+    border-radius:11px;margin-bottom:0;
+  }
+  .card-icon{width:20px;height:20px}
+  .card-text{flex:1;min-width:0}
+  .card-tag{display:block;margin-bottom:.12rem;font-size:8.5px}
+  .card-title{font-size:15px;margin-bottom:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .card-desc,.card-formula,.card-inputs{display:none}
+  .card-btn{
+    flex-shrink:0;width:40px;height:40px;
+    padding:0;border-radius:10px;
+    font-size:0;min-height:unset;
+  }
+  .card-btn .card-arrow{width:15px;height:15px}
+  .card-footer{display:none}
 }
 
 /* ── Small phone (≤ 420px) ── */
 @media(max-width:420px){
-  .wrap{padding:1.6rem .85rem 3rem}
+  .wrap{padding:1.4rem .85rem 5rem}
   .main-title{font-size:28px;letter-spacing:-.8px}
   .main-sub{font-size:13.5px;max-width:100%}
   .lab-chip{padding:6px 14px 6px 10px}
   .chip-text{font-size:10px}
-  .card-body{padding:1.15rem}
-  .card-formula{display:none}
-  .card-inputs{gap:5px;margin-bottom:.95rem}
-  .input-chip{font-size:10.5px;padding:3.5px 9px}
-  .card-desc{font-size:12.5px;margin-bottom:1rem}
-  .card-btn{padding:12px;font-size:13.5px}
-  .card-icon-wrap{width:48px;height:48px;border-radius:12px;margin-bottom:.8rem}
-  .card-icon{width:23px;height:23px}
-  .card-title{font-size:17px}
-  .card-footer{padding:.7rem 1.15rem}
-  .card-footer-meta{font-size:9.5px}
   .info-panel{grid-template-columns:1fr}
-  .stat-num{font-size:18px}
-  .stat-lbl{font-size:8.5px}
 }
 
 /* ── Extra small (≤ 360px) ── */
 @media(max-width:360px){
   .main-title{font-size:25px}
-  .card-body{padding:1rem}
-  .card-title{font-size:16px}
-  .card-btn{font-size:13px;padding:11px}
-  .stats-bar{border-radius:13px}
 }
 
 /* ── Touch targets: ensure min 44px on mobile ── */
@@ -552,8 +555,10 @@ body::before{
             <line x1="9" y1="3" x2="15" y2="3"/>
           </svg>
         </div>
+        <div class="card-text">
         <div class="card-tag blue">TS · MS</div>
         <div class="card-title">TS &amp; MS Calculator</div>
+        </div>
         <div class="card-desc">คำนวณ Total Solid และ Moisture Content จากน้ำหนักตัวอย่างดิบ-อบแห้ง รองรับ Blank correction และ Banker's rounding</div>
         <div class="card-formula">
           <span class="card-formula-icon">∑</span>
@@ -586,8 +591,10 @@ body::before{
             <polyline points="12 7 12 12 15.5 15.5"/>
           </svg>
         </div>
+        <div class="card-text">
         <div class="card-tag teal">Tool Tracker</div>
         <div class="card-title">Lab Tool Tracker</div>
+        </div>
         <div class="card-desc">บันทึกและติดตามการใช้งานเครื่องมือแล็บ — เลือกเครื่องมือ บันทึกเวลาเริ่มต้น แล้วสิ้นสุดเมื่อเสร็จงาน รองรับหลายผู้ใช้</div>
         <div class="card-formula">
           <span class="card-formula-icon">⏱</span>
@@ -620,8 +627,10 @@ body::before{
             <line x1="7" y1="9" x2="17" y2="9"/><line x1="7" y1="13" x2="17" y2="13"/><line x1="7" y1="17" x2="12" y2="17"/>
           </svg>
         </div>
+        <div class="card-text">
         <div class="card-tag violet">Paper Analysis</div>
         <div class="card-title">Paper Moisture (MS)</div>
+        </div>
         <div class="card-desc">คำนวณความชื้นกระดาษตาม ISO 287 และ TAPPI T412 จากน้ำหนักก่อน-หลังอบ พร้อมแสดงระดับความชื้น</div>
         <div class="card-formula">
           <span class="card-formula-icon">∑</span>
