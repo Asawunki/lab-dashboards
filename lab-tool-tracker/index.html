@@ -284,6 +284,27 @@
       line-height:1;
     }
     .del-btn:hover{background:#fee2e2;transform:scale(1.15)}
+    .edit-btn{
+      background:transparent;border:none;color:#2563eb;
+      cursor:pointer;font-size:1.05rem;padding:.1rem .3rem;
+      border-radius:50%;transition:all .18s;display:block;margin-top:.2rem;line-height:1;
+    }
+    .edit-btn:hover{background:#eff6ff;transform:scale(1.15)}
+    .btn-save{
+      padding:.55rem 1.4rem;background:linear-gradient(135deg,#2563eb,#0ea5e9);
+      border:none;border-radius:8px;color:#fff;font-family:inherit;
+      font-size:.88rem;font-weight:700;cursor:pointer;transition:all .2s;
+      box-shadow:0 4px 14px rgba(37,99,235,.3);
+    }
+    .btn-save:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(37,99,235,.4)}
+    .btn-save:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+    .edit-phase{display:none}.edit-phase.active{display:block}
+    .edit-diff-box{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:.75rem;font-size:.8rem;margin-bottom:.9rem}
+    .edit-diff-label{font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.3rem}
+    .edit-diff-before{color:#991b1b}.edit-diff-after{color:#15803d}
+    .edit-confirm-input{border:2px solid #d0dcea;border-radius:8px;padding:.5rem .75rem;font-family:inherit;font-size:.88rem;width:100%;box-sizing:border-box;margin-top:.4rem;transition:border-color .2s}
+    .edit-confirm-input:focus{outline:none;border-color:#2563eb}
+    .edit-confirm-input.valid{border-color:#16a34a;background:#f0fdf4}
     .empty-state{text-align:center;padding:2.5rem 1rem;color:#7a90aa;font-size:.85rem}
 
     .export-btn{
@@ -647,6 +668,66 @@
   </div>
 </div>
 
+<!-- Edit Record Modal (two-phase: EDIT to unlock, CONFIRM to save) -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="edit-modal-title">แก้ไขบันทึก</span>
+      <button class="modal-close" onclick="closeEditModal()">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- Tool info (shown in both phases) -->
+      <div style="margin-bottom:.9rem;padding:.6rem .8rem;background:#eff6ff;border-radius:8px;border:1px solid #bfdbfe">
+        <div style="font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#1e40af;margin-bottom:.2rem">เครื่องมือที่แก้ไข</div>
+        <div id="edit-modal-info" style="font-family:'JetBrains Mono',monospace;font-size:.88rem;color:#2563eb;font-weight:600"></div>
+      </div>
+
+      <!-- PHASE 1: type EDIT to unlock -->
+      <div class="edit-phase active" id="edit-phase-1">
+        <div style="margin-bottom:.9rem">
+          <div class="edit-diff-box">
+            <div class="edit-diff-label" style="color:#374151">หมายเหตุปัจจุบัน</div>
+            <div id="edit-current-notes" style="color:#374151;white-space:pre-wrap;word-break:break-word">—</div>
+          </div>
+        </div>
+        <div style="margin-bottom:1.1rem">
+          <label class="form-label">พิมพ์ <b style="color:#2563eb;letter-spacing:.05em">EDIT</b> เพื่อปลดล็อกการแก้ไข</label>
+          <input class="edit-confirm-input" id="edit-unlock-input" type="text" placeholder="EDIT" autocomplete="off" oninput="onEditUnlockInput()" />
+        </div>
+        <div style="display:flex;gap:.65rem;justify-content:flex-end">
+          <button class="btn-end" onclick="closeEditModal()">ยกเลิก</button>
+          <button class="btn-save" id="edit-unlock-btn" onclick="proceedToEditPhase2()" disabled>🔓 ปลดล็อก</button>
+        </div>
+      </div>
+
+      <!-- PHASE 2: edit textarea + type CONFIRM to save -->
+      <div class="edit-phase" id="edit-phase-2">
+        <div style="margin-bottom:1rem">
+          <span class="form-label">แก้ไขหมายเหตุ</span>
+          <textarea id="edit-modal-notes" rows="4" placeholder="หมายเหตุ (ถ้ามี)" style="resize:vertical;min-height:72px;width:100%;box-sizing:border-box" oninput="onEditNotesInput()"></textarea>
+        </div>
+        <div id="edit-diff-preview" class="edit-diff-box" style="display:none">
+          <div class="edit-diff-label edit-diff-before">ก่อนแก้ไข</div>
+          <div id="edit-diff-before-text" style="margin-bottom:.6rem;white-space:pre-wrap;word-break:break-word;color:#991b1b"></div>
+          <div class="edit-diff-label edit-diff-after">หลังแก้ไข</div>
+          <div id="edit-diff-after-text" style="white-space:pre-wrap;word-break:break-word;color:#15803d"></div>
+        </div>
+        <div id="edit-modal-msg"></div>
+        <div style="margin-bottom:1.1rem">
+          <label class="form-label">พิมพ์ <b style="color:#16a34a;letter-spacing:.05em">CONFIRM</b> เพื่อยืนยันการบันทึก</label>
+          <input class="edit-confirm-input" id="edit-confirm-input" type="text" placeholder="CONFIRM" autocomplete="off" oninput="onEditConfirmInput()" />
+        </div>
+        <div style="display:flex;gap:.65rem;justify-content:flex-end">
+          <button class="btn-end" onclick="closeEditModal()">ยกเลิก</button>
+          <button class="btn-save" id="edit-save-btn" onclick="saveEditRecord()" disabled>💾 บันทึก</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 <script>
 const SUPABASE_URL = 'https://sgpaeoovzjrjwcpjyiem.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNncGFlb292empyandjcGp5aWVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NTI2OTgsImV4cCI6MjA5NDQyODY5OH0.fG1uDWNMpAbq64-RQrLkIB2IhMEgjykyolVWv50PIBE';
@@ -788,6 +869,8 @@ let selectedFlatItems = [];
 let flatCount = null;
 let flatCounts = {};
 var _countModalOnSelect = null;
+var _editRecordId = null;
+var _editOriginalNotes = null;
 
 // Category pills
 document.querySelectorAll('.cat-pill').forEach(function(p) {
@@ -1607,6 +1690,7 @@ function renderRecordItem(r) {
     + '</div>'
     + '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:.25rem">'
     + durHtml
+    + (!isActive ? '<button class="edit-btn" title="แก้ไขหมายเหตุ" onclick="openEditModal(\''+r.id+'\')">✏️</button>' : '')
     + '<button class="del-btn" onclick="deleteRecord(\''+r.id+'\')">✕</button>'
     + '</div>'
     + '</div>';
@@ -1662,6 +1746,96 @@ async function deleteRecord(id) {
   }
 }
 
+function openEditModal(id) {
+  var record = allRecords.find(function(r) { return r.id === id; });
+  if (!record) return;
+  _editRecordId = id;
+  _editOriginalNotes = record.notes || '';
+  var icon = CAT_ICONS[record.category] ? ' ' + CAT_ICONS[record.category] : '';
+  document.getElementById('edit-modal-info').textContent =
+    record.tool_id + icon + '  ·  ' + (CAT_LABELS[record.category] || record.category);
+  document.getElementById('edit-current-notes').textContent = _editOriginalNotes || '(ไม่มีหมายเหตุ)';
+  document.getElementById('edit-modal-notes').value = _editOriginalNotes;
+  document.getElementById('edit-unlock-input').value = '';
+  document.getElementById('edit-confirm-input').value = '';
+  document.getElementById('edit-unlock-input').classList.remove('valid');
+  document.getElementById('edit-confirm-input').classList.remove('valid');
+  document.getElementById('edit-unlock-btn').disabled = true;
+  document.getElementById('edit-save-btn').disabled = true;
+  document.getElementById('edit-modal-msg').innerHTML = '';
+  document.getElementById('edit-diff-preview').style.display = 'none';
+  document.getElementById('edit-phase-1').classList.add('active');
+  document.getElementById('edit-phase-2').classList.remove('active');
+  document.getElementById('edit-modal-title').textContent = 'แก้ไขบันทึก — ขั้นที่ 1/2';
+  document.getElementById('edit-modal').classList.add('open');
+}
+
+function closeEditModal() {
+  document.getElementById('edit-modal').classList.remove('open');
+  _editRecordId = null;
+  _editOriginalNotes = null;
+}
+
+function onEditUnlockInput() {
+  var val = document.getElementById('edit-unlock-input').value;
+  var ok = val === 'EDIT';
+  document.getElementById('edit-unlock-btn').disabled = !ok;
+  document.getElementById('edit-unlock-input').classList.toggle('valid', ok);
+}
+
+function proceedToEditPhase2() {
+  document.getElementById('edit-phase-1').classList.remove('active');
+  document.getElementById('edit-phase-2').classList.add('active');
+  document.getElementById('edit-modal-title').textContent = 'แก้ไขบันทึก — ขั้นที่ 2/2';
+  onEditNotesInput();
+}
+
+function onEditNotesInput() {
+  var newNotes = document.getElementById('edit-modal-notes').value.trim();
+  var diffEl = document.getElementById('edit-diff-preview');
+  if (newNotes !== _editOriginalNotes) {
+    document.getElementById('edit-diff-before-text').textContent = _editOriginalNotes || '(ว่าง)';
+    document.getElementById('edit-diff-after-text').textContent = newNotes || '(ว่าง)';
+    diffEl.style.display = 'block';
+  } else {
+    diffEl.style.display = 'none';
+  }
+  onEditConfirmInput();
+}
+
+function onEditConfirmInput() {
+  var val = document.getElementById('edit-confirm-input').value;
+  var ok = val === 'CONFIRM';
+  document.getElementById('edit-save-btn').disabled = !ok;
+  document.getElementById('edit-confirm-input').classList.toggle('valid', ok);
+}
+
+async function saveEditRecord() {
+  if (!_editRecordId) return;
+  var notes = document.getElementById('edit-modal-notes').value.trim() || null;
+  var msgEl = document.getElementById('edit-modal-msg');
+  var saveBtn = document.getElementById('edit-save-btn');
+  saveBtn.disabled = true;
+  saveBtn.textContent = 'กำลังบันทึก...';
+  msgEl.innerHTML = '';
+  var res = await sb.from('tool_records')
+    .update({ notes: notes })
+    .eq('id', _editRecordId)
+    .eq('user_id', currentUser.id)
+    .select();
+  if (res.error) {
+    msgEl.innerHTML = '<div class="msg msg-error">บันทึกไม่สำเร็จ: ' + res.error.message + '</div>';
+    saveBtn.disabled = false;
+    saveBtn.textContent = '💾 บันทึก';
+    return;
+  }
+  var idx = allRecords.findIndex(function(r) { return r.id === _editRecordId; });
+  if (idx !== -1 && res.data && res.data[0]) allRecords[idx] = res.data[0];
+  closeEditModal();
+  renderActiveSessions();
+  renderRecords();
+}
+
 // ── Helpers ───────────────────────────────────
 
 function pad(n) { return String(n).padStart(2,'0'); }
@@ -1685,6 +1859,10 @@ function exportCSV() {
   var a = document.createElement('a'); a.href = URL.createObjectURL(blob);
   a.download = 'lab-records-'+new Date().toLocaleDateString('en-CA')+'.csv'; a.click();
 }
+
+document.getElementById('edit-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeEditModal();
+});
 
 </script>
 </body>
