@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='16' fill='%232563eb'/%3E%3Cpath d='M9 3v8l-4 6h14l-4-6V3' fill='none' stroke='white' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E">
+<title>Molecule Snake — Lab Games</title>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --blue:#2563eb;--blue-light:#0ea5e9;--blue-dark:#1e40af;
+  --violet:#7c3aed;--violet-light:#a78bfa;
+  --teal:#0d9488;--teal-light:#14b8a6;
+  --green:#16a34a;--green-light:#4ade80;
+  --orange:#ea580c;--orange-light:#fb923c;
+  --slate:#0f172a;--muted:#64748b;
+  --border:#e2e8f0;--bg:#f0f5ff;
+  --card-bg:rgba(255,255,255,0.92);
+}
+
+body{
+  font-family:'Prompt',-apple-system,sans-serif;
+  background:var(--bg);color:var(--slate);
+  min-height:100vh;overflow-x:hidden;position:relative;
+}
+
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(37,99,235,.05) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(37,99,235,.05) 1px,transparent 1px);
+  background-size:44px 44px;pointer-events:none;z-index:0;
+}
+
+.orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(72px);opacity:.15;animation:orbDrift 20s ease-in-out infinite alternate}
+.orb1{width:400px;height:400px;background:radial-gradient(circle,#2563eb,transparent);top:-100px;right:-80px;animation-duration:22s}
+.orb2{width:300px;height:300px;background:radial-gradient(circle,#7c3aed,transparent);bottom:-80px;left:-80px;animation-duration:18s;animation-delay:-9s}
+@keyframes orbDrift{from{transform:translate(0,0) scale(1)}to{transform:translate(28px,36px) scale(1.1)}}
+
+.wrap{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:2rem 1.25rem 4rem}
+
+/* ── Header ── */
+.page-header{display:flex;align-items:center;gap:1rem;margin-bottom:1.75rem}
+.back-btn{
+  display:flex;align-items:center;justify-content:center;
+  width:40px;height:40px;border-radius:12px;
+  background:var(--card-bg);border:1px solid var(--border);
+  text-decoration:none;color:var(--muted);
+  box-shadow:0 2px 10px rgba(0,0,0,.06);
+  transition:all .2s;flex-shrink:0;
+}
+.back-btn:hover{color:var(--blue);border-color:rgba(37,99,235,.3);transform:translateX(-2px)}
+.back-btn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.page-title-wrap{flex:1}
+.page-chip{font-size:9.5px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--green);background:#dcfce7;padding:3px 9px;border-radius:20px;display:inline-block;margin-bottom:.25rem}
+.page-title{font-size:22px;font-weight:800;color:var(--slate);letter-spacing:-.5px}
+.page-title span{background:linear-gradient(135deg,var(--green),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+/* ── Score Bar ── */
+.scorebar{
+  display:flex;gap:.75rem;margin-bottom:1.25rem;flex-wrap:wrap;
+}
+.score-pill{
+  background:var(--card-bg);border:1px solid var(--border);
+  border-radius:12px;padding:.6rem 1rem;
+  box-shadow:0 2px 10px rgba(0,0,0,.05);
+  text-align:center;flex:1;min-width:80px;
+}
+.score-num{font-size:20px;font-weight:800;color:var(--blue);line-height:1;letter-spacing:-.5px}
+.score-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-top:2px}
+.score-pill.hi .score-num{color:var(--violet)}
+.score-pill.lv .score-num{color:var(--green)}
+
+/* ── Game Container ── */
+.game-wrap{
+  background:var(--card-bg);
+  border:1px solid var(--border);
+  border-radius:22px;overflow:hidden;
+  box-shadow:0 8px 36px rgba(0,0,0,.08);
+  position:relative;
+}
+.canvas-wrap{
+  position:relative;display:flex;
+  align-items:center;justify-content:center;
+  background:#f8fafc;
+  border-bottom:1px solid var(--border);
+}
+canvas{display:block;touch-action:none;max-width:100%}
+
+/* ── Overlay ── */
+.overlay{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:rgba(248,250,252,.94);backdrop-filter:blur(6px);
+  z-index:10;gap:.75rem;
+  transition:opacity .25s;
+}
+.overlay.hidden{opacity:0;pointer-events:none}
+.overlay-icon{font-size:52px;line-height:1}
+.overlay-title{font-size:22px;font-weight:800;color:var(--slate);letter-spacing:-.4px}
+.overlay-sub{font-size:13px;color:var(--muted);text-align:center;max-width:240px;line-height:1.6}
+.play-btn{
+  display:flex;align-items:center;gap:8px;
+  background:linear-gradient(135deg,var(--green),var(--teal));
+  color:#fff;border:none;border-radius:13px;
+  padding:13px 28px;font-size:14px;font-weight:700;
+  cursor:pointer;font-family:'Prompt',sans-serif;
+  box-shadow:0 4px 18px rgba(22,163,74,.3);
+  transition:all .2s;letter-spacing:.2px;
+  margin-top:.25rem;
+}
+.play-btn:hover{transform:translateY(-2px);box-shadow:0 8px 26px rgba(22,163,74,.4);filter:brightness(1.06)}
+.play-btn:active{transform:translateY(0);transition-duration:.08s}
+.play-btn svg{width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+
+.dead-score{
+  background:#f0fdf4;border:1px solid #bbf7d0;
+  border-radius:12px;padding:.5rem 1.5rem;
+  font-size:13px;color:#166534;font-weight:600;
+  display:none;
+}
+.dead-score.show{display:block}
+
+/* ── Game Footer ── */
+.game-footer{padding:1rem 1.4rem;display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap}
+.legend{display:flex;gap:.6rem;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);font-weight:600}
+.legend-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.controls-hint{font-size:10.5px;color:#94a3b8;text-align:right;line-height:1.55}
+
+/* ── Touch Controls ── */
+.touch-pad{
+  display:none;
+  margin-top:1.25rem;
+}
+.dpad{
+  display:grid;grid-template-columns:repeat(3,56px);grid-template-rows:repeat(3,56px);
+  gap:4px;margin:0 auto;width:fit-content;
+}
+.dpad-btn{
+  width:56px;height:56px;border-radius:13px;
+  background:var(--card-bg);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.07);
+  transition:background .12s, transform .1s;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
+.dpad-btn:active{background:#dbeafe;transform:scale(.92);transition-duration:.05s}
+.dpad-btn svg{width:22px;height:22px;fill:none;stroke:var(--blue);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.dpad-btn.empty{background:transparent;border:none;box-shadow:none;pointer-events:none}
+
+@media(hover:none),(max-width:600px){
+  .touch-pad{display:block}
+  .controls-hint{display:none}
+}
+
+/* ── Info cards ── */
+.info-row{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-top:1.25rem}
+.info-card{
+  background:var(--card-bg);border:1px solid var(--border);border-radius:16px;
+  padding:1rem 1.1rem;box-shadow:0 2px 12px rgba(0,0,0,.04);
+}
+.info-icon{font-size:20px;margin-bottom:.4rem}
+.info-title{font-size:12px;font-weight:700;color:var(--slate);margin-bottom:.2rem}
+.info-text{font-size:11px;color:var(--muted);line-height:1.6}
+
+@media(max-width:480px){.info-row{grid-template-columns:1fr}}
+
+@keyframes fadeDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+.page-header{animation:fadeDown .45s .05s ease both}
+.scorebar{animation:fadeDown .45s .12s ease both}
+.game-wrap{animation:fadeDown .45s .2s ease both}
+</style>
+</head>
+<body>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<div class="wrap">
+
+  <!-- Header -->
+  <div class="page-header">
+    <a class="back-btn" href="../index.html" title="กลับหน้าหลัก">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    </a>
+    <div class="page-title-wrap">
+      <div class="page-chip">Lab Games</div>
+      <div class="page-title"><span>Molecule</span> Snake</div>
+    </div>
+  </div>
+
+  <!-- Score Bar -->
+  <div class="scorebar">
+    <div class="score-pill">
+      <div class="score-num" id="score">0</div>
+      <div class="score-lbl">Score</div>
+    </div>
+    <div class="score-pill hi">
+      <div class="score-num" id="hiscore">0</div>
+      <div class="score-lbl">Best</div>
+    </div>
+    <div class="score-pill lv">
+      <div class="score-num" id="level">1</div>
+      <div class="score-lbl">Level</div>
+    </div>
+    <div class="score-pill">
+      <div class="score-num" id="molecules">0</div>
+      <div class="score-lbl">Molecules</div>
+    </div>
+  </div>
+
+  <!-- Game -->
+  <div class="game-wrap">
+    <div class="canvas-wrap">
+      <canvas id="gameCanvas"></canvas>
+
+      <!-- Start overlay -->
+      <div class="overlay" id="overlayStart">
+        <div class="overlay-icon">🧪</div>
+        <div class="overlay-title">Molecule Snake</div>
+        <div class="overlay-sub">เก็บ molecule ให้ครบ — หลีกเลี่ยงกำแพงและตัวเอง!</div>
+        <button class="play-btn" id="btnStart">
+          <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          เริ่มเกม
+        </button>
+      </div>
+
+      <!-- Dead overlay -->
+      <div class="overlay hidden" id="overlayDead">
+        <div class="overlay-icon">💥</div>
+        <div class="overlay-title">Game Over!</div>
+        <div class="dead-score" id="deadScore"></div>
+        <div class="overlay-sub">งูชนกำแพงหรือตัวเอง<br>ลองใหม่อีกครั้งไหม?</div>
+        <button class="play-btn" id="btnRestart">
+          <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>
+          เล่นใหม่
+        </button>
+      </div>
+    </div>
+
+    <div class="game-footer">
+      <div class="legend" id="legend"></div>
+      <div class="controls-hint">
+        ↑ ↓ ← → หรือ WASD เพื่อเลี้ยว<br>
+        Space เพื่อหยุด/เล่นต่อ
+      </div>
+    </div>
+  </div>
+
+  <!-- Touch D-pad -->
+  <div class="touch-pad">
+    <div class="dpad">
+      <div class="dpad-btn empty"></div>
+      <div class="dpad-btn" id="btnUp">
+        <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+      </div>
+      <div class="dpad-btn empty"></div>
+      <div class="dpad-btn" id="btnLeft">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      </div>
+      <div class="dpad-btn" id="btnDown">
+        <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="dpad-btn" id="btnRight">
+        <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Info -->
+  <div class="info-row">
+    <div class="info-card">
+      <div class="info-icon">⚗️</div>
+      <div class="info-title">Molecule Types</div>
+      <div class="info-text">H₂O, CO₂, O₂, NaCl, HCl, C₆H₁₂O₆ แต่ละตัวให้คะแนนต่างกัน</div>
+    </div>
+    <div class="info-card">
+      <div class="info-icon">⚡</div>
+      <div class="info-title">Level Up</div>
+      <div class="info-text">เก็บครบ 5 molecules = Level ขึ้น ความเร็วงูจะเพิ่มขึ้นทุก Level</div>
+    </div>
+    <div class="info-card">
+      <div class="info-icon">🏆</div>
+      <div class="info-title">High Score</div>
+      <div class="info-text">คะแนนสูงสุดถูกบันทึกไว้ใน browser ไม่หายแม้ปิดหน้าต่าง</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ── Config ── */
+const CELL = 22;
+const COLS = 22, ROWS = 20;
+const W = COLS * CELL, H = ROWS * CELL;
+
+const MOLECULES = [
+  {label:'H₂O', color:'#0ea5e9', bg:'#e0f2fe', pts:1},
+  {label:'O₂',  color:'#16a34a', bg:'#dcfce7', pts:1},
+  {label:'CO₂', color:'#7c3aed', bg:'#ede9fe', pts:2},
+  {label:'NaCl',color:'#ea580c', bg:'#fff7ed', pts:2},
+  {label:'HCl', color:'#dc2626', bg:'#fee2e2', pts:3},
+  {label:'C₆H₁₂O₆',color:'#d97706',bg:'#fef3c7', pts:5},
+];
+
+/* ── Canvas ── */
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+canvas.width = W; canvas.height = H;
+
+/* ── Responsive scale ── */
+function fitCanvas(){
+  const avail = Math.min(canvas.parentElement.clientWidth, 560);
+  const scale = avail / W;
+  canvas.style.width  = (W * scale) + 'px';
+  canvas.style.height = (H * scale) + 'px';
+}
+fitCanvas();
+window.addEventListener('resize', fitCanvas);
+
+/* ── State ── */
+let snake, dir, nextDir, food, score, hiScore, level, molecules, paused, dead, loopId, speed;
+
+const scoreEl    = document.getElementById('score');
+const hiscoreEl  = document.getElementById('hiscore');
+const levelEl    = document.getElementById('level');
+const moleculesEl= document.getElementById('molecules');
+const overlayStart= document.getElementById('overlayStart');
+const overlayDead = document.getElementById('overlayDead');
+const deadScoreEl = document.getElementById('deadScore');
+const legendEl    = document.getElementById('legend');
+
+/* ── Legend ── */
+function buildLegend(){
+  legendEl.innerHTML = MOLECULES.map(m=>
+    `<div class="legend-item">
+      <div class="legend-dot" style="background:${m.color}"></div>
+      <span>${m.label} +${m.pts}</span>
+    </div>`
+  ).join('');
+}
+buildLegend();
+
+/* ── High score persistence ── */
+function loadHi(){ return parseInt(localStorage.getItem('molSnakeHi')||'0',10) }
+function saveHi(v){ localStorage.setItem('molSnakeHi',v) }
+
+/* ── Init game ── */
+function initGame(){
+  snake = [{x:10,y:10},{x:9,y:10},{x:8,y:10}];
+  dir = {x:1,y:0};
+  nextDir = {x:1,y:0};
+  score = 0; level = 1; molecules = 0;
+  speed = 140;
+  dead = false; paused = false;
+  hiScore = loadHi();
+  updateHUD();
+  spawnFood();
+}
+
+/* ── Spawn food ── */
+function spawnFood(){
+  const mol = MOLECULES[Math.floor(Math.random()*MOLECULES.length)];
+  let pos;
+  do { pos = {x:Math.floor(Math.random()*COLS), y:Math.floor(Math.random()*ROWS)} }
+  while(snake.some(s=>s.x===pos.x&&s.y===pos.y));
+  food = {...pos, mol};
+}
+
+/* ── HUD ── */
+function updateHUD(){
+  scoreEl.textContent    = score;
+  hiscoreEl.textContent  = hiScore;
+  levelEl.textContent    = level;
+  moleculesEl.textContent= molecules;
+}
+
+/* ── Game loop ── */
+function loop(){
+  if(paused||dead) return;
+  dir = nextDir;
+
+  const head = {x: snake[0].x + dir.x, y: snake[0].y + dir.y};
+
+  /* wall collision */
+  if(head.x<0||head.x>=COLS||head.y<0||head.y>=ROWS){
+    die(); return;
+  }
+  /* self collision */
+  if(snake.some(s=>s.x===head.x&&s.y===head.y)){
+    die(); return;
+  }
+
+  snake.unshift(head);
+
+  /* eat food? */
+  if(head.x===food.x&&head.y===food.y){
+    score += food.mol.pts * level;
+    molecules++;
+    if(score > hiScore){ hiScore = score; saveHi(hiScore) }
+    if(molecules % 5 === 0){
+      level++;
+      speed = Math.max(60, speed - 12);
+    }
+    updateHUD();
+    spawnFood();
+  } else {
+    snake.pop();
+  }
+
+  draw();
+  loopId = setTimeout(loop, speed);
+}
+
+/* ── Draw ── */
+function draw(){
+  ctx.clearRect(0,0,W,H);
+
+  /* grid */
+  ctx.strokeStyle='rgba(37,99,235,.06)';
+  ctx.lineWidth=1;
+  for(let x=0;x<=W;x+=CELL){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}
+  for(let y=0;y<=H;y+=CELL){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}
+
+  /* food */
+  const fx = food.x*CELL + CELL/2;
+  const fy = food.y*CELL + CELL/2;
+  const r  = CELL*0.42;
+
+  /* glow */
+  ctx.shadowColor  = food.mol.color;
+  ctx.shadowBlur   = 14;
+  ctx.fillStyle    = food.mol.bg;
+  ctx.beginPath();
+  ctx.arc(fx,fy,r,0,Math.PI*2);
+  ctx.fill();
+  ctx.shadowBlur = 0;
+  ctx.strokeStyle = food.mol.color;
+  ctx.lineWidth   = 2;
+  ctx.beginPath();
+  ctx.arc(fx,fy,r,0,Math.PI*2);
+  ctx.stroke();
+
+  /* molecule label */
+  ctx.fillStyle = food.mol.color;
+  const lbl = food.mol.label;
+  const fs   = lbl.length > 4 ? 8 : lbl.length > 3 ? 9 : 10;
+  ctx.font = `700 ${fs}px 'JetBrains Mono',monospace`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(lbl, fx, fy);
+
+  /* snake */
+  snake.forEach((seg, i) => {
+    const x = seg.x*CELL, y = seg.y*CELL;
+    const isHead = i === 0;
+
+    if(isHead){
+      /* head gradient */
+      const grd = ctx.createLinearGradient(x,y,x+CELL,y+CELL);
+      grd.addColorStop(0,'#2563eb');
+      grd.addColorStop(1,'#0ea5e9');
+      ctx.fillStyle = grd;
+    } else {
+      /* body: fade from blue to teal */
+      const t = i / (snake.length - 1 || 1);
+      ctx.fillStyle = lerpColor('#2563eb','#0d9488',t);
+    }
+
+    const pad = isHead ? 1 : 2;
+    const br  = isHead ? 7  : 5;
+    roundRect(ctx, x+pad, y+pad, CELL-pad*2, CELL-pad*2, br);
+    ctx.fill();
+
+    /* head eyes */
+    if(isHead){
+      ctx.fillStyle = '#fff';
+      const cx = x + CELL/2, cy = y + CELL/2;
+      const ex = dir.x, ey = dir.y;
+      const perp = {x:-ey, y:ex};
+      const eyeR = 2.5;
+      const eyeOff = 3.5;
+      const fwd = 2;
+      [[1],[-1]].forEach(([s])=>{
+        const ex2 = cx + ex*fwd + perp.x*eyeOff*s;
+        const ey2 = cy + ey*fwd + perp.y*eyeOff*s;
+        ctx.beginPath();ctx.arc(ex2,ey2,eyeR,0,Math.PI*2);ctx.fill();
+        ctx.fillStyle='#0f172a';
+        ctx.beginPath();ctx.arc(ex2+ex*.8,ey2+ey*.8,1.2,0,Math.PI*2);ctx.fill();
+        ctx.fillStyle='#fff';
+      });
+    }
+  });
+}
+
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);
+  ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
+  ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);
+  ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);
+  ctx.closePath();
+}
+
+function lerpColor(a,b,t){
+  const ah = parseInt(a.slice(1),16), bh = parseInt(b.slice(1),16);
+  const ar=[ah>>16,ah>>8&255,ah&255], br=[bh>>16,bh>>8&255,bh&255];
+  const rr = ar.map((v,i)=>Math.round(v+(br[i]-v)*t));
+  return '#'+rr.map(v=>v.toString(16).padStart(2,'0')).join('');
+}
+
+/* ── Die ── */
+function die(){
+  dead = true;
+  clearTimeout(loopId);
+  /* draw red flash */
+  ctx.fillStyle = 'rgba(220,38,38,.12)';
+  ctx.fillRect(0,0,W,H);
+
+  deadScoreEl.textContent = `Score: ${score}  ·  Level: ${level}  ·  Molecules: ${molecules}`;
+  deadScoreEl.classList.add('show');
+  overlayDead.classList.remove('hidden');
+}
+
+/* ── Controls ── */
+const DIRS = {
+  ArrowUp:{x:0,y:-1},ArrowDown:{x:0,y:1},ArrowLeft:{x:-1,y:0},ArrowRight:{x:1,y:0},
+  w:{x:0,y:-1},s:{x:0,y:1},a:{x:-1,y:0},d:{x:1,y:0},
+  W:{x:0,y:-1},S:{x:0,y:1},A:{x:-1,y:0},D:{x:1,y:0},
+};
+
+document.addEventListener('keydown', e=>{
+  if(dead) return;
+  if(e.key===' '){togglePause();return}
+  const nd = DIRS[e.key];
+  if(!nd) return;
+  e.preventDefault();
+  /* no 180 reversal */
+  if(nd.x===-dir.x&&nd.y===-dir.y) return;
+  nextDir = nd;
+  if(paused) togglePause();
+});
+
+function setDir(nd){
+  if(dead) return;
+  if(nd.x===-dir.x&&nd.y===-dir.y) return;
+  nextDir = nd;
+  if(paused) togglePause();
+}
+
+document.getElementById('btnUp').addEventListener('click',    ()=>setDir({x:0,y:-1}));
+document.getElementById('btnDown').addEventListener('click',  ()=>setDir({x:0,y:1}));
+document.getElementById('btnLeft').addEventListener('click',  ()=>setDir({x:-1,y:0}));
+document.getElementById('btnRight').addEventListener('click', ()=>setDir({x:1,y:0}));
+
+/* Touch swipe */
+let tx=0,ty=0;
+canvas.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY},{passive:true});
+canvas.addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-tx, dy=e.changedTouches[0].clientY-ty;
+  if(Math.abs(dx)<8&&Math.abs(dy)<8) return;
+  if(Math.abs(dx)>Math.abs(dy)) setDir(dx>0?{x:1,y:0}:{x:-1,y:0});
+  else setDir(dy>0?{x:0,y:1}:{x:0,y:-1});
+},{passive:true});
+
+/* Pause */
+function togglePause(){
+  if(dead) return;
+  paused = !paused;
+  if(!paused){ loopId = setTimeout(loop, speed) }
+}
+
+/* ── Start / Restart ── */
+function startGame(){
+  overlayStart.classList.add('hidden');
+  overlayDead.classList.add('hidden');
+  deadScoreEl.classList.remove('show');
+  clearTimeout(loopId);
+  initGame();
+  draw();
+  loopId = setTimeout(loop, speed);
+}
+
+document.getElementById('btnStart').addEventListener('click', startGame);
+document.getElementById('btnRestart').addEventListener('click', startGame);
+
+/* Initial state */
+hiScore = loadHi();
+hiscoreEl.textContent = hiScore;
+/* Draw empty grid on load */
+(function drawEmpty(){
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle='rgba(37,99,235,.06)';ctx.lineWidth=1;
+  for(let x=0;x<=W;x+=CELL){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}
+  for(let y=0;y<=H;y+=CELL){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}
+})();
+
+})();
+</script>
+</body>
+</html>
