@@ -17,6 +17,8 @@
   --violet-light:#a78bfa;
   --teal:#0d9488;
   --teal-light:#14b8a6;
+  --green:#16a34a;
+  --green-light:#4ade80;
   --slate:#0f172a;
   --slate-700:#334155;
   --muted:#64748b;
@@ -189,6 +191,7 @@ body::before{
 .card-stripe.blue{background:linear-gradient(90deg,var(--blue),var(--blue-light))}
 .card-stripe.violet{background:linear-gradient(90deg,var(--violet),var(--violet-light))}
 .card-stripe.teal{background:linear-gradient(90deg,var(--teal),var(--teal-light))}
+.card-stripe.green{background:linear-gradient(90deg,var(--green),var(--green-light))}
 
 .card-body{padding:1.8rem}
 
@@ -200,10 +203,12 @@ body::before{
 .card-icon-wrap.blue{background:linear-gradient(135deg,#eff6ff,#dbeafe)}
 .card-icon-wrap.violet{background:linear-gradient(135deg,#f5f3ff,#ede9fe)}
 .card-icon-wrap.teal{background:linear-gradient(135deg,#f0fdfa,#ccfbf1)}
+.card-icon-wrap.green{background:linear-gradient(135deg,#f0fdf4,#dcfce7)}
 .card-icon{width:27px;height:27px;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .card-icon.blue{stroke:var(--blue)}
 .card-icon.violet{stroke:var(--violet)}
 .card-icon.teal{stroke:var(--teal)}
+.card-icon.green{stroke:var(--green)}
 
 /* tag */
 .card-tag{
@@ -214,6 +219,7 @@ body::before{
 .card-tag.blue{background:#eff6ff;color:var(--blue)}
 .card-tag.violet{background:#f5f3ff;color:var(--violet)}
 .card-tag.teal{background:#f0fdfa;color:var(--teal)}
+.card-tag.green{background:#f0fdf4;color:var(--green)}
 
 .card-title{
   font-size:19px;font-weight:800;color:var(--slate);
@@ -240,6 +246,7 @@ body::before{
 .input-chip.blue{background:#dbeafe;color:#1d4ed8}
 .input-chip.violet{background:#ede9fe;color:#6d28d9}
 .input-chip.teal{background:#ccfbf1;color:#0f766e}
+.input-chip.green{background:#dcfce7;color:#166534}
 
 /* CTA */
 .card-btn{
@@ -255,6 +262,8 @@ body::before{
 .card-btn.violet:hover{box-shadow:0 6px 24px rgba(124,58,237,.45);filter:brightness(1.06)}
 .card-btn.teal{background:linear-gradient(135deg,var(--teal),var(--teal-light));color:#fff;box-shadow:0 4px 16px rgba(13,148,136,.28)}
 .card-btn.teal:hover{box-shadow:0 6px 24px rgba(13,148,136,.45);filter:brightness(1.06)}
+.card-btn.green{background:linear-gradient(135deg,var(--green),var(--green-light));color:#fff;box-shadow:0 4px 16px rgba(22,163,74,.28)}
+.card-btn.green:hover{box-shadow:0 6px 24px rgba(22,163,74,.45);filter:brightness(1.06)}
 
 .card-arrow{
   width:16px;height:16px;fill:none;stroke:#fff;
@@ -302,6 +311,7 @@ body::before{
 .tool-card:nth-child(1){animation:fadeUp .55s .35s ease both}
 .tool-card:nth-child(2){animation:fadeUp .55s .48s ease both}
 .tool-card:nth-child(3){animation:fadeUp .55s .61s ease both}
+.tool-card:nth-child(4){animation:fadeUp .55s .74s ease both}
 .info-card:nth-child(1){animation:fadeUp .5s .7s ease both}
 .info-card:nth-child(2){animation:fadeUp .5s .78s ease both}
 .info-card:nth-child(3){animation:fadeUp .5s .86s ease both}
@@ -408,6 +418,7 @@ body::before{
 .fdock-btn.blue  {border-left:3px solid var(--blue)}
 .fdock-btn.teal  {border-left:3px solid var(--teal)}
 .fdock-btn.violet{border-left:3px solid var(--violet)}
+.fdock-btn.green {border-left:3px solid var(--green)}
 
 .fdock-icon{
   flex-shrink:0;
@@ -418,6 +429,7 @@ body::before{
 .fdock-btn.blue   .fdock-icon svg{stroke:var(--blue)}
 .fdock-btn.teal   .fdock-icon svg{stroke:var(--teal)}
 .fdock-btn.violet .fdock-icon svg{stroke:var(--violet)}
+.fdock-btn.green  .fdock-icon svg{stroke:var(--green)}
 
 .fdock-label{
   font-size:12.5px;font-weight:700;
@@ -436,6 +448,7 @@ body::before{
 .fdock-btn:nth-child(1){animation-delay:.82s}
 .fdock-btn:nth-child(2){animation-delay:.97s}
 .fdock-btn:nth-child(3){animation-delay:1.12s}
+.fdock-btn:nth-child(4){animation-delay:1.27s}
 
 /* ── Mobile: bottom bar ── */
 @media(max-width:768px){
@@ -464,6 +477,7 @@ body::before{
   .fdock-btn.blue  {border-top-color:var(--blue)}
   .fdock-btn.teal  {border-top-color:var(--teal)}
   .fdock-btn.violet{border-top-color:var(--violet)}
+  .fdock-btn.green {border-top-color:var(--green)}
   .fdock-btn:hover{width:auto;box-shadow:none}
   .fdock-icon{width:auto;height:auto}
   .fdock-icon svg{width:18px;height:18px}
@@ -522,7 +536,7 @@ body::before{
 
     <div class="stats-bar">
       <div class="stat">
-        <div class="stat-num">3</div>
+        <div class="stat-num">4</div>
         <div class="stat-lbl">เครื่องมือ</div>
       </div>
       <div class="stat">
@@ -618,6 +632,45 @@ body::before{
       </div>
     </a>
 
+    <!-- Card 4: Molecule Snake -->
+    <a class="tool-card" href="game/index.html">
+      <div class="card-stripe green"></div>
+      <div class="card-body">
+        <div class="card-icon-wrap green">
+          <svg class="card-icon green" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M12 3a9 9 0 0 1 9 9"/>
+            <path d="M3 12a9 9 0 0 1 9-9"/>
+            <circle cx="12" cy="3" r="1.5" fill="currentColor" stroke="none"/>
+            <circle cx="21" cy="12" r="1.5" fill="currentColor" stroke="none"/>
+          </svg>
+        </div>
+        <div class="card-text">
+        <div class="card-tag green">Lab Games</div>
+        <div class="card-title">Molecule Snake</div>
+        </div>
+        <div class="card-desc">งูกินโมเลกุล H₂O, CO₂, NaCl และอื่นๆ — เกม Snake theme ห้องแล็บ เล่นใน browser ได้เลย</div>
+        <div class="card-formula">
+          <span class="card-formula-icon">🧪</span>
+          <span>Score = pts × level · เก็บ 5 molecules = level ขึ้น</span>
+        </div>
+        <div class="card-inputs">
+          <span class="input-chip green">H₂O</span>
+          <span class="input-chip green">CO₂</span>
+          <span class="input-chip green">NaCl</span>
+          <span class="input-chip green">C₆H₁₂O₆ +5</span>
+        </div>
+        <button class="card-btn green" tabindex="-1">
+          Play Game
+          <svg class="card-arrow" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+      <div class="card-footer">
+        <span class="card-footer-meta">Browser-based · High Score · Mobile</span>
+        <div class="card-footer-dot"></div>
+      </div>
+    </a>
+
     <!-- Card 3: Paper Moisture -->
     <a class="tool-card" href="paper-moisture/index.html">
       <div class="card-stripe violet"></div>
@@ -690,6 +743,13 @@ body::before{
       <svg viewBox="0 0 24 24"><path d="M9 3v8l-4 6h14l-4-6V3"/><line x1="9" y1="3" x2="15" y2="3"/></svg>
     </div>
     <span class="fdock-label">TS &amp; MS</span>
+  </a>
+
+  <a class="fdock-btn green" href="game/index.html" title="Molecule Snake">
+    <div class="fdock-icon">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3a9 9 0 0 1 9 9"/><path d="M3 12a9 9 0 0 1 9-9"/><circle cx="12" cy="3" r="1.5" fill="currentColor" stroke="none"/><circle cx="21" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg>
+    </div>
+    <span class="fdock-label">Snake</span>
   </a>
 
   <a class="fdock-btn teal" href="lab-tool-tracker/index.html" title="Lab Tool Tracker">
