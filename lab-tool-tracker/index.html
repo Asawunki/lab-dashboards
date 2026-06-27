@@ -744,9 +744,10 @@ const MULTI_SELECT_CATS = {'Shaker': true};
 const SUBSTANCE_TOOL = 'BA-LAB-020';
 const MENU_TOOLS = ['BA-LAB-017', 'BA-LAB-014'];
 const SUBSTANCES = [
-  { id:'cuso4', label:'CuSO₄·5H₂O', sub:'0.5 g', group:'chem' },
-  { id:'k2so4', label:'K₂SO₄',            sub:'10 g',  group:'chem' },
-  { id:'soy',   label:'นมถั่วเหลือง', sub:'', group:'bio' },
+  { id:'cuso4',  label:'CuSO₄·5H₂O',      sub:'0.5 g', group:'chem' },
+  { id:'k2so4',  label:'K₂SO₄',            sub:'10 g',  group:'chem' },
+  { id:'soy',    label:'นมถั่วเหลือง',     sub:'',      group:'bio' },
+  { id:'bottle', label:'ขวดบรรจุภัณฑ์',   sub:'',      group:'bottle' },
 ];
 const BA017_MENUS = [
   {
@@ -771,9 +772,11 @@ const BA017_MENUS = [
       { id: 'r4', label: 'MS ถั่วเหลือง',          detail: '',     group: 'g2' },
       { id: 'r5', label: 'Protein ถั่วเหลือง',     detail: '1g',   group: 'g2' },
       { id: 'r9', label: 'Fat ถั่วเหลือง',         detail: '10g',  group: 'g2' },
-      { id: 'r6', label: 'MS นมผง',               detail: '',    group: 'g3' },
-      { id: 'r7', label: 'Fat นมผง',              detail: '1g',  group: 'g3' },
-      { id: 'r8', label: 'Protein นมผง',          detail: '1g',  group: 'g3' },
+      { id: 'r6',  label: 'MS นมผง',       detail: '',   group: 'g3' },
+      { id: 'r7',  label: 'Fat นมผง',      detail: '1g', group: 'g3' },
+      { id: 'r8',  label: 'Protein นมผง',  detail: '1g', group: 'g3' },
+      { id: 'r10', label: 'MS ข้าว',       detail: '',   group: 'g4' },
+      { id: 'r11', label: 'Protein ข้าว',  detail: '1g', group: 'g4' },
     ],
   },
   {
@@ -806,7 +809,8 @@ const FLAT_CAT_CONFIG = {
       { id: 'fd_r2', label: 'Protein กากถั่วเหลือง',       detail: '', toolCountRanges: { 'DI-LAB-004': [1, 7], 'DI-LAB-005': [1, 10] } },
       { id: 'fd_r3', label: 'Protein น้ำถั่ว',              detail: '', toolCountRanges: { 'DI-LAB-004': [1, 7], 'DI-LAB-005': [1, 10] } },
       { id: 'fd_r5', label: 'Protein ถั่วเหลือง',           detail: '', toolCountRanges: { 'DI-LAB-004': [1, 7], 'DI-LAB-005': [1, 10] } },
-      { id: 'fd_r8', label: 'Protein นมผง',                 detail: '', toolCountRanges: { 'DI-LAB-004': [1, 7], 'DI-LAB-005': [1, 10] } },
+      { id: 'fd_r8', label: 'Protein นมผง',  detail: '', toolCountRanges: { 'DI-LAB-004': [1, 7], 'DI-LAB-005': [1, 10] } },
+      { id: 'fd_rk', label: 'Protein ข้าว', detail: '', toolCountRanges: { 'DI-LAB-004': [1, 7], 'DI-LAB-005': [1, 10] } },
       { id: 'fd_c2', label: 'Ammonium sulfate + Sucrose',   detail: '', noCount: true },
       { id: 'fd_c3', label: 'L-Tryptophan + Sucrose',       detail: '', noCount: true },
     ],
@@ -819,7 +823,8 @@ const FLAT_CAT_CONFIG = {
       { id: 'fi_r2', label: 'Protein กากถั่วเหลือง',       detail: '' },
       { id: 'fi_r3', label: 'Protein น้ำถั่ว',              detail: '' },
       { id: 'fi_r5', label: 'Protein ถั่วเหลือง',           detail: '' },
-      { id: 'fi_r8', label: 'Protein นมผง',                 detail: '' },
+      { id: 'fi_r8', label: 'Protein นมผง',  detail: '' },
+      { id: 'fi_rk', label: 'Protein ข้าว', detail: '' },
       { id: 'fi_c1', label: 'Ammonium sulfate',             detail: '', noCount: true },
       { id: 'fi_c2', label: 'Ammonium sulfate + Sucrose',   detail: '', noCount: true },
       { id: 'fi_c3', label: 'L-Tryptophan + Sucrose',       detail: '', noCount: true },
@@ -861,7 +866,7 @@ let filterMode = 'today';
 let filterDateVal = new Date().toLocaleDateString('en-CA');
 let filterCat = '';
 let selectedSubstances = [];
-let substanceCounts = { chem: null, bio: null };
+let substanceCounts = { chem: null, bio: null, bottle: null };
 let selectedMenu017 = null;
 let selectedSubItems017 = [];
 let substanceCounts017 = {};
@@ -1010,7 +1015,7 @@ function updateSubstanceSection() {
   if (!el) return;
   var show = selectedTools.indexOf(SUBSTANCE_TOOL) !== -1;
   el.style.display = show ? 'block' : 'none';
-  if (!show) { selectedSubstances = []; substanceCounts = { chem: null, bio: null }; }
+  if (!show) { selectedSubstances = []; substanceCounts = { chem: null, bio: null, bottle: null }; }
   renderSubstancePills();
   renderCountSection();
 }
@@ -1030,7 +1035,7 @@ function toggleSubstance(id) {
   var idx = selectedSubstances.indexOf(id);
   if (idx === -1) selectedSubstances.push(id);
   else selectedSubstances.splice(idx, 1);
-  substanceCounts = { chem: null, bio: null };
+  substanceCounts = { chem: null, bio: null, bottle: null };
   renderSubstancePills();
   renderCountSection();
 }
@@ -1065,6 +1070,14 @@ function renderCountSection() {
       + '<button type="button" class="btn btn-primary" style="width:auto;padding:.65rem 1.25rem;font-size:1rem" onclick="openCountModalBA020(\'bio\')">'
       + bioDisplay + '</button></div>';
   }
+  var hasBottle = selectedSubstances.indexOf('bottle') !== -1;
+  if (hasBottle) {
+    var bottleDisplay = substanceCounts.bottle ? substanceCounts.bottle + ' ขวด' : 'เลือก';
+    html += '<div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.35rem">'
+      + '<span style="font-size:.8rem;font-weight:600;color:#2563eb;min-width:130px">ขวดบรรจุภัณฑ์</span>'
+      + '<button type="button" class="btn btn-primary" style="width:auto;padding:.65rem 1.25rem;font-size:1rem" onclick="openCountModalBA020(\'bottle\')">'
+      + bottleDisplay + '</button></div>';
+  }
   inner.innerHTML = html;
 }
 
@@ -1090,7 +1103,12 @@ function setSubstanceCount(n) {
 }
 
 function openCountModalBA020(group) {
-  if (group === 'bio') {
+  if (group === 'bottle') {
+    openCountModal(1, 6, 'ขวดบรรจุภัณฑ์', function(n) {
+      substanceCounts.bottle = n;
+      renderCountSection();
+    });
+  } else if (group === 'bio') {
     openCountModal(1, 6, 'นมถั่วเหลือง', function(n) {
       substanceCounts.bio = n;
       renderCountSection();
@@ -1385,12 +1403,17 @@ async function startSession() {
       return s && s.group === 'chem';
     });
     var hasBio020 = selectedSubstances.indexOf('soy') !== -1;
+    var hasBottle020 = selectedSubstances.indexOf('bottle') !== -1;
     if (hasChems020 && !substanceCounts.chem) {
       msgEl.innerHTML = '<div class="msg msg-error">กรุณาเลือกจำนวนตัวอย่างสารเคมี</div>';
       return;
     }
     if (hasBio020 && !substanceCounts.bio) {
       msgEl.innerHTML = '<div class="msg msg-error">กรุณาเลือกจำนวนตัวอย่างนมถั่วเหลือง</div>';
+      return;
+    }
+    if (hasBottle020 && !substanceCounts.bottle) {
+      msgEl.innerHTML = '<div class="msg msg-error">กรุณาเลือกจำนวนขวดบรรจุภัณฑ์</div>';
       return;
     }
     var substParts = [];
@@ -1403,6 +1426,9 @@ async function startSession() {
     }
     if (hasBio020) {
       substParts.push('นมถั่วเหลือง × ' + substanceCounts.bio + ' ตัวอย่าง');
+    }
+    if (hasBottle020) {
+      substParts.push('ขวดบรรจุภัณฑ์ × ' + substanceCounts.bottle + ' ขวด');
     }
     var substPrefix = '[' + substParts.join(' / ') + ']';
     notes = substPrefix + (notes ? ' ' + notes : '');
@@ -1535,7 +1561,7 @@ async function startSession() {
   res.data.forEach(function(r) { allRecords.unshift(r); });
   document.getElementById('inp-notes').value  = '';
   document.getElementById('inp-start').value  = '';
-  selectedSubstances = []; substanceCounts = { chem: null, bio: null };
+  selectedSubstances = []; substanceCounts = { chem: null, bio: null, bottle: null };
   renderSubstancePills(); renderCountSection();
   selectedMenu017 = null; selectedSubItems017 = []; substanceCounts017 = {};
   renderMenuPills017();
