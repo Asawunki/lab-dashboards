@@ -867,7 +867,7 @@ let filterDateVal = new Date().toLocaleDateString('en-CA');
 let filterCat = '';
 let selectedSubstances = [];
 let substanceCounts = { chem: null, bio: null, bottle: null };
-let selectedMenu017 = null;
+let selectedMenus017 = [];
 let selectedSubItems017 = [];
 let substanceCounts017 = {};
 let selectedFlatItems = [];
@@ -1130,7 +1130,11 @@ function openCountModalBA020(group) {
 }
 
 function openCountModalBA017(itemId) {
-  var menu = BA017_MENUS.find(function(m) { return m.id === selectedMenu017; });
+  var menu = null;
+  for (var i = 0; i < selectedMenus017.length; i++) {
+    var m = BA017_MENUS.find(function(x) { return x.id === selectedMenus017[i]; });
+    if (m && m.items.find(function(x) { return x.id === itemId; })) { menu = m; break; }
+  }
   if (!menu || !menu.hasCount) return;
   var item = menu.items.find(function(x) { return x.id === itemId; });
   var label = item ? item.label : '';
@@ -1147,25 +1151,36 @@ function updateBA017Section() {
   if (!el) return;
   var show = MENU_TOOLS.some(function(tool) { return selectedTools.indexOf(tool) !== -1; });
   el.style.display = show ? 'block' : 'none';
-  if (!show) { selectedMenu017 = null; selectedSubItems017 = []; substanceCounts017 = {}; }
+  if (!show) { selectedMenus017 = []; selectedSubItems017 = []; substanceCounts017 = {}; }
   renderMenuPills017();
 }
 
 function renderMenuPills017() {
   var container = document.getElementById('menu-017-pills');
   if (!container) return;
+  var isMultiMenu = selectedMenus017.length > 1;
   container.innerHTML = BA017_MENUS.map(function(m) {
-    var isActive = selectedMenu017 === m.id;
-    return '<div class="cat-pill' + (isActive ? ' active' : '') + '" onclick="selectMenu017(\'' + m.id + '\')">' + m.label + '</div>';
+    var isActive = selectedMenus017.indexOf(m.id) !== -1;
+    var multiCls = isActive && isMultiMenu ? ' multi' : '';
+    return '<div class="cat-pill' + (isActive ? ' active' + multiCls : '') + '" onclick="toggleMenu017(\'' + m.id + '\')">' + m.label + '</div>';
   }).join('');
   renderSubSection017();
 }
 
-function selectMenu017(id) {
-  if (selectedMenu017 === id) return;
-  selectedMenu017 = id;
-  selectedSubItems017 = [];
-  substanceCounts017 = {};
+function toggleMenu017(id) {
+  var idx = selectedMenus017.indexOf(id);
+  if (idx === -1) {
+    selectedMenus017.push(id);
+  } else {
+    selectedMenus017.splice(idx, 1);
+    // Remove items that belong to this menu
+    var menu = BA017_MENUS.find(function(m) { return m.id === id; });
+    if (menu) {
+      var menuItemIds = menu.items.map(function(x) { return x.id; });
+      selectedSubItems017 = selectedSubItems017.filter(function(sid) { return menuItemIds.indexOf(sid) === -1; });
+      menuItemIds.forEach(function(sid) { delete substanceCounts017[sid]; });
+    }
+  }
   renderMenuPills017();
 }
 
@@ -1173,71 +1188,90 @@ function renderSubSection017() {
   var subSec = document.getElementById('sub-017-section');
   var cntSec = document.getElementById('count-017-section');
   if (!subSec) return;
-  if (!selectedMenu017) { subSec.style.display = 'none'; return; }
+  if (selectedMenus017.length === 0) { subSec.style.display = 'none'; return; }
   subSec.style.display = 'block';
   renderSubPills017();
-  var menu = BA017_MENUS.find(function(m) { return m.id === selectedMenu017; });
   if (cntSec) {
-    var hasCountableItems = selectedSubItems017.some(function(id) {
-      var it = menu ? menu.items.find(function(x) { return x.id === id; }) : null;
-      return it && !it.noCount;
+    var hasCountable = selectedMenus017.some(function(menuId) {
+      var menu = BA017_MENUS.find(function(m) { return m.id === menuId; });
+      if (!menu || !menu.hasCount) return false;
+      return selectedSubItems017.some(function(id) {
+        var it = menu.items.find(function(x) { return x.id === id; });
+        return it && !it.noCount;
+      });
     });
-    var showCount = menu && menu.hasCount && hasCountableItems;
-    cntSec.style.display = showCount ? 'block' : 'none';
-    if (showCount) renderCountSection017();
+    cntSec.style.display = hasCountable ? 'block' : 'none';
+    if (hasCountable) renderCountSection017();
   }
 }
 
 function renderCountSection017() {
   var inner = document.getElementById('count-017-inner');
   if (!inner) return;
-  var menu = BA017_MENUS.find(function(m) { return m.id === selectedMenu017; });
-  if (!menu || !menu.hasCount) return;
-  inner.innerHTML = selectedSubItems017.filter(function(id) {
-    var item = menu.items.find(function(x) { return x.id === id; });
-    return item && !item.noCount;
-  }).map(function(id) {
-    var item = menu.items.find(function(x) { return x.id === id; });
-    if (!item) return '';
-    var cnt = substanceCounts017[id];
-    var label = item.label + (item.detail ? ' <span style="font-size:.8em;opacity:.7">' + item.detail + '</span>' : '');
-    return '<div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.35rem">'
-      + '<span style="font-size:.8rem;font-weight:600;color:#2563eb;min-width:130px">' + label + '</span>'
-      + '<button type="button" class="btn btn-primary" style="width:auto;padding:.65rem 1.25rem;font-size:1rem"'
-      + ' onclick="openCountModalBA017(\'' + id + '\')">'
-      + (cnt ? cnt + ' ตัวอย่าง' : 'เลือก') + '</button>'
-      + '</div>';
-  }).join('');
+  var html = '';
+  selectedMenus017.forEach(function(menuId) {
+    var menu = BA017_MENUS.find(function(m) { return m.id === menuId; });
+    if (!menu || !menu.hasCount) return;
+    var menuItems = selectedSubItems017.filter(function(id) {
+      var item = menu.items.find(function(x) { return x.id === id; });
+      return item && !item.noCount;
+    });
+    if (menuItems.length === 0) return;
+    if (selectedMenus017.length > 1) {
+      html += '<div style="font-size:.72rem;font-weight:700;color:#0f172a;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.25rem;margin-top:.15rem">' + menu.label + '</div>';
+    }
+    menuItems.forEach(function(id) {
+      var item = menu.items.find(function(x) { return x.id === id; });
+      if (!item) return;
+      var cnt = substanceCounts017[id];
+      var label = item.label + (item.detail ? ' <span style="font-size:.8em;opacity:.7">' + item.detail + '</span>' : '');
+      html += '<div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.35rem">'
+        + '<span style="font-size:.8rem;font-weight:600;color:#2563eb;min-width:130px">' + label + '</span>'
+        + '<button type="button" class="btn btn-primary" style="width:auto;padding:.65rem 1.25rem;font-size:1rem"'
+        + ' onclick="openCountModalBA017(\'' + id + '\')">'
+        + (cnt ? cnt + ' ตัวอย่าง' : 'เลือก') + '</button>'
+        + '</div>';
+    });
+  });
+  inner.innerHTML = html;
 }
 
 function renderSubPills017() {
   var container = document.getElementById('sub-017-pills');
-  if (!container || !selectedMenu017) return;
-  var menu = BA017_MENUS.find(function(m) { return m.id === selectedMenu017; });
-  if (!menu) return;
-
+  if (!container || selectedMenus017.length === 0) return;
   var isMulti = selectedSubItems017.length > 1;
-  var lastGroup = null;
-  container.innerHTML = menu.items.map(function(item) {
-    var isActive = selectedSubItems017.indexOf(item.id) !== -1;
-    var groupHint = '';
-    if (item.group && item.group !== lastGroup) {
-      if (lastGroup !== null) groupHint = '<div style="width:100%;flex-basis:100%;height:0;margin:2px 0"></div>';
-      lastGroup = item.group;
+  var parts = [];
+  selectedMenus017.forEach(function(menuId, menuIdx) {
+    var menu = BA017_MENUS.find(function(m) { return m.id === menuId; });
+    if (!menu) return;
+    var lastGroup = null;
+    var menuHtml = '';
+    if (selectedMenus017.length > 1) {
+      menuHtml += '<div style="width:100%;flex-basis:100%;font-size:.7rem;font-weight:700;color:#0f172a;letter-spacing:.06em;text-transform:uppercase;margin-top:' + (menuIdx > 0 ? '.55rem' : '0') + ';margin-bottom:.2rem;padding-top:' + (menuIdx > 0 ? '.5rem' : '0') + ';border-top:' + (menuIdx > 0 ? '1px solid #e2e8f0' : 'none') + '">' + menu.label + '</div>';
     }
-    var cls = 'subst-pill' + (isActive ? ' active' : '') + (isActive && isMulti ? ' multi' : '');
-    var label = item.label + (item.detail ? ' <span class="subst-sub">' + item.detail + '</span>' : '');
-    return groupHint + '<div class="' + cls + '" onclick="toggleSubItem017(\'' + item.id + '\')">' + label + '</div>';
-  }).join('');
+    menu.items.forEach(function(item) {
+      var isActive = selectedSubItems017.indexOf(item.id) !== -1;
+      var groupHint = '';
+      if (item.group && item.group !== lastGroup) {
+        if (lastGroup !== null) groupHint = '<div style="width:100%;flex-basis:100%;height:0;margin:2px 0"></div>';
+        lastGroup = item.group;
+      }
+      var cls = 'subst-pill' + (isActive ? ' active' : '') + (isActive && isMulti ? ' multi' : '');
+      var label = item.label + (item.detail ? ' <span class="subst-sub">' + item.detail + '</span>' : '');
+      menuHtml += groupHint + '<div class="' + cls + '" onclick="toggleSubItem017(\'' + item.id + '\')">' + label + '</div>';
+    });
+    parts.push(menuHtml);
+  });
+  container.innerHTML = parts.join('');
 }
 
 function toggleSubItem017(id) {
-  var menu = BA017_MENUS.find(function(m) { return m.id === selectedMenu017; });
-  if (!menu) return;
   var idx = selectedSubItems017.indexOf(id);
   if (idx === -1) selectedSubItems017.push(id);
-  else selectedSubItems017.splice(idx, 1);
-  if (menu.hasCount) substanceCounts017 = {};
+  else {
+    selectedSubItems017.splice(idx, 1);
+    delete substanceCounts017[id];
+  }
   renderSubPills017();
   renderSubSection017();
 }
@@ -1436,7 +1470,7 @@ async function startSession() {
 
   // Validate substance selection for BA-LAB-017/014 (multi-menu tools)
   if (MENU_TOOLS.some(function(tool) { return selectedTools.indexOf(tool) !== -1; })) {
-    if (!selectedMenu017) {
+    if (selectedMenus017.length === 0) {
       msgEl.innerHTML = '<div class="msg msg-error">กรุณาเลือกหมวดตัวอย่าง</div>';
       return;
     }
@@ -1444,29 +1478,45 @@ async function startSession() {
       msgEl.innerHTML = '<div class="msg msg-error">กรุณาเลือกรายการที่ชั่ง</div>';
       return;
     }
-    var menu017 = BA017_MENUS.find(function(m) { return m.id === selectedMenu017; });
-    if (menu017 && menu017.hasCount) {
+    // Validate counts for each selected menu
+    for (var mi017 = 0; mi017 < selectedMenus017.length; mi017++) {
+      var menu017 = BA017_MENUS.find(function(m) { return m.id === selectedMenus017[mi017]; });
+      if (!menu017 || !menu017.hasCount) continue;
       var missingItem = selectedSubItems017.find(function(id) {
         var it = menu017.items.find(function(x) { return x.id === id; });
-        return !(it && it.noCount) && !substanceCounts017[id];
+        if (!it) return false;
+        return !it.noCount && !substanceCounts017[id];
       });
       if (missingItem) {
-        var mi = menu017.items.find(function(x) { return x.id === missingItem; });
-        msgEl.innerHTML = '<div class="msg msg-error">กรุณาเลือกจำนวนตัวอย่างของ ' + (mi ? mi.label : missingItem) + '</div>';
+        var mii = menu017.items.find(function(x) { return x.id === missingItem; });
+        msgEl.innerHTML = '<div class="msg msg-error">กรุณาเลือกจำนวนตัวอย่างของ ' + (mii ? mii.label : missingItem) + '</div>';
         return;
       }
     }
-    var itemParts017 = selectedSubItems017.map(function(id) {
-      var item = menu017 ? menu017.items.find(function(x) { return x.id === id; }) : null;
-      var label = item ? item.label + (item.detail ? ' ' + item.detail : '') : id;
-      if (menu017 && menu017.hasCount) {
-        var cnt017 = (item && item.noCount) ? 1 : substanceCounts017[id];
-        return label + ' × ' + cnt017;
+    // Build notes prefix — per menu
+    var menuPrefixParts = selectedMenus017.map(function(menuId) {
+      var menu017 = BA017_MENUS.find(function(m) { return m.id === menuId; });
+      if (!menu017) return '';
+      var menuItemIds = menu017.items.map(function(x) { return x.id; });
+      var items017 = selectedSubItems017.filter(function(id) { return menuItemIds.indexOf(id) !== -1; });
+      if (items017.length === 0) return '';
+      var parts = items017.map(function(id) {
+        var item = menu017.items.find(function(x) { return x.id === id; });
+        var lbl = item ? item.label + (item.detail ? ' ' + item.detail : '') : id;
+        if (menu017.hasCount) {
+          var cnt017 = (item && item.noCount) ? 1 : substanceCounts017[id];
+          return lbl + ' × ' + cnt017;
+        }
+        return lbl;
+      });
+      var sep017 = menu017.hasCount ? ' / ' : ' + ';
+      var suffix = menu017.hasCount ? ' ตัวอย่าง' : '';
+      if (selectedMenus017.length > 1) {
+        return menu017.label + ': ' + parts.join(sep017) + suffix;
       }
-      return label;
-    });
-    var sep017 = menu017 && menu017.hasCount ? ' / ' : ' + ';
-    var prefix017 = '[' + itemParts017.join(sep017) + (menu017 && menu017.hasCount ? ' ตัวอย่าง' : '') + ']';
+      return parts.join(sep017) + suffix;
+    }).filter(function(s) { return s; });
+    var prefix017 = '[' + menuPrefixParts.join(' | ') + ']';
     notes = prefix017 + (notes ? ' ' + notes : '');
   }
 
@@ -1563,7 +1613,7 @@ async function startSession() {
   document.getElementById('inp-start').value  = '';
   selectedSubstances = []; substanceCounts = { chem: null, bio: null, bottle: null };
   renderSubstancePills(); renderCountSection();
-  selectedMenu017 = null; selectedSubItems017 = []; substanceCounts017 = {};
+  selectedMenus017 = []; selectedSubItems017 = []; substanceCounts017 = {};
   renderMenuPills017();
   selectedFlatItems = []; flatCount = null; flatCounts = {};
   renderFlatPills();
