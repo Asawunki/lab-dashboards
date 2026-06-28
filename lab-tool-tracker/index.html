@@ -374,6 +374,19 @@
       border-radius:20px;padding:.22rem .65rem;
     }
 
+    /* ── Tool sub-group separator ── */
+    .tool-sep{
+      display:flex;align-items:center;gap:.5rem;
+      padding:.1rem 0;margin:.3rem 0 .25rem;
+    }
+    .tool-sep::before,.tool-sep::after{content:'';flex:1;height:1px;background:#e8eef5}
+    .tool-sep span{
+      font-size:.65rem;font-weight:700;color:#7a90aa;letter-spacing:.06em;
+      text-transform:uppercase;white-space:nowrap;
+      background:#f8fafc;border:1px solid #e0e8f0;
+      border-radius:20px;padding:.18rem .55rem;
+    }
+
     /* ── Modal ── */
     .modal-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:200;align-items:center;justify-content:center;padding:1.5rem}
     .modal-overlay.open{display:flex}
@@ -1808,7 +1821,22 @@ function renderRecords() {
       var label = dt.toLocaleDateString('th-TH', {weekday:'short', day:'numeric', month:'short', year:'2-digit'});
       html += '<div class="date-sep"><span>'+label+'</span></div>';
     }
-    html += groups[d].map(renderRecordItem).join('');
+    var dayRecs = groups[d];
+    // Split Balance records: BA-LAB-020 vs BA-LAB-014/017, others stay in place
+    var has020   = dayRecs.some(function(r) { return r.tool_id === 'BA-LAB-020'; });
+    var has01417 = dayRecs.some(function(r) { return r.tool_id === 'BA-LAB-014' || r.tool_id === 'BA-LAB-017'; });
+    var needSplit = has020 && has01417;
+    if (needSplit) {
+      var group020   = dayRecs.filter(function(r) { return r.tool_id === 'BA-LAB-020'; });
+      var group01417 = dayRecs.filter(function(r) { return r.tool_id === 'BA-LAB-014' || r.tool_id === 'BA-LAB-017'; });
+      var others     = dayRecs.filter(function(r) { return r.tool_id !== 'BA-LAB-020' && r.tool_id !== 'BA-LAB-014' && r.tool_id !== 'BA-LAB-017'; });
+      html += group020.map(renderRecordItem).join('');
+      html += '<div class="tool-sep"><span>BA-LAB-014 · BA-LAB-017</span></div>';
+      html += group01417.map(renderRecordItem).join('');
+      html += others.map(renderRecordItem).join('');
+    } else {
+      html += dayRecs.map(renderRecordItem).join('');
+    }
   });
 
   el.innerHTML = html;
