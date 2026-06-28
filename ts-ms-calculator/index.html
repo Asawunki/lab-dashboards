@@ -11,32 +11,16 @@
 body{
   font-family:'Prompt',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   background-color:#d6e8fb;
-  background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cg fill='none' stroke='%232563eb' stroke-width='1.3' opacity='0.13'%3E%3Cline x1='40' y1='10' x2='66' y2='25'/%3E%3Cline x1='66' y1='25' x2='66' y2='55'/%3E%3Cline x1='66' y1='55' x2='40' y2='70'/%3E%3Cline x1='40' y1='70' x2='14' y2='55'/%3E%3Cline x1='14' y1='55' x2='14' y2='25'/%3E%3Cline x1='14' y1='25' x2='40' y2='10'/%3E%3C/g%3E%3Cg fill='%232563eb' opacity='0.22'%3E%3Ccircle cx='40' cy='10' r='3'/%3E%3Ccircle cx='66' cy='25' r='3'/%3E%3Ccircle cx='66' cy='55' r='3'/%3E%3Ccircle cx='40' cy='70' r='3'/%3E%3Ccircle cx='14' cy='55' r='3'/%3E%3Ccircle cx='14' cy='25' r='3'/%3E%3C/g%3E%3C/svg%3E");
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cg fill='none' stroke='%232563eb' stroke-width='1.3' opacity='0.13'%3E%3Cline x1='40' y1='10' x2='66' y2='25'/%3E%3Cline x1='66' y1='25' x2='66' y2='55'/%3E%3Cline x1='66' y1='55' x2='40' y2='70'/%3E%3Cline x1='40' y1='70' x2='14' y2='55'/%3E%3Cline x1='14' y1='55' x2='14' y2='25'/%3E%3Cline x1='14' y1='25' x2='40' y2='10'/%3E%3C/g%3E%3Cg fill='%232563eb' opacity='0.22'%3E%3Ccircle cx='40' cy='10' r='3'/%3E%3Ccircle cx='66' cy='25' r='3'/%3E%3Ccircle cx='66' cy='55' r='3'/%3E%3Ccircle cx='40' cy='70' r='3'/%3E%3Ccircle cx='14' cy='55' r='3'/%3E%3Ccircle cx='14' cy='25' r='3'/%3E%3C/g%3E%3C/svg%3E");
   background-size:80px 80px;
   color:#1e2b3c;
   min-height:100vh;
-  position:relative;
   overflow-x:hidden;
 }
-body::before{
-  content:'';
-  position:fixed;top:-60px;right:-60px;
-  width:360px;height:360px;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Ccircle cx='100' cy='100' r='14' fill='%232563eb'/%3E%3Ccircle cx='100' cy='100' r='6' fill='%23fff'/%3E%3Cellipse cx='100' cy='100' rx='88' ry='34' fill='none' stroke='%232563eb' stroke-width='4'/%3E%3Cellipse cx='100' cy='100' rx='88' ry='34' fill='none' stroke='%232563eb' stroke-width='4' transform='rotate(60 100 100)'/%3E%3Cellipse cx='100' cy='100' rx='88' ry='34' fill='none' stroke='%232563eb' stroke-width='4' transform='rotate(120 100 100)'/%3E%3C/svg%3E");
-  background-size:contain;background-repeat:no-repeat;
-  opacity:0.09;pointer-events:none;z-index:0;
-}
-body::after{
-  content:'';
-  position:fixed;bottom:-40px;left:-40px;
-  width:280px;height:330px;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 125'%3E%3Crect x='38' y='4' width='24' height='36' rx='3' fill='none' stroke='%232563eb' stroke-width='3.5'/%3E%3Cpath d='M38 40 L12 98 Q7 118 26 118 L74 118 Q93 118 88 98 L62 40 Z' fill='none' stroke='%232563eb' stroke-width='3.5'/%3E%3Cpath d='M26 92 Q20 118 26 118 L74 118 Q80 118 74 92 Z' fill='%232563eb' opacity='0.2'/%3E%3Ccircle cx='42' cy='80' r='4' fill='%232563eb' opacity='0.25'/%3E%3Ccircle cx='58' cy='70' r='3' fill='%232563eb' opacity='0.2'/%3E%3Ccircle cx='50' cy='95' r='5' fill='%232563eb' opacity='0.3'/%3E%3C/svg%3E");
-  background-size:contain;background-repeat:no-repeat;
-  opacity:0.1;pointer-events:none;z-index:0;
-}
-.wrap{max-width:540px;margin:0 auto;padding:2rem 1rem 1rem;position:relative;z-index:1}
 
+.wrap{max-width:860px;margin:0 auto;padding:2rem 1rem 2rem;position:relative}
+
+/* Back btn */
 .back-btn{
   display:inline-flex;align-items:center;gap:6px;
   background:#fff;border:1px solid #c8d9ed;border-radius:20px;
@@ -46,11 +30,11 @@ body::after{
   box-shadow:0 1px 4px rgba(30,80,160,0.07);
   transition:all 0.2s;
 }
-.back-btn:hover{background:#eff6ff;border-color:#93c5fd;box-shadow:0 2px 8px rgba(37,99,235,0.12)}
+.back-btn:hover{background:#eff6ff;border-color:#93c5fd}
 .back-btn svg{width:14px;height:14px;fill:none;stroke:#2563eb;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 
-/* ── Header ── */
-.header{text-align:center;margin-bottom:2rem}
+/* Header */
+.header{text-align:center;margin-bottom:1.5rem}
 .lab-bar{
   display:inline-flex;align-items:center;gap:8px;
   background:#fff;border:1px solid #c8d9ed;border-radius:24px;
@@ -68,85 +52,43 @@ body::after{
 .title span{color:#2563eb}
 .subtitle{font-size:12px;color:#7a90aa;letter-spacing:0.4px}
 
-/* ── Section card ── */
+/* Section card */
 .section{
-  background:#fff;
-  border:1px solid #d0dcea;
-  border-top:3px solid #2563eb;
-  border-radius:10px;
-  padding:1.25rem;
-  margin-bottom:1rem;
+  background:#fff;border:1px solid #d0dcea;
+  border-top:3px solid #2563eb;border-radius:10px;
+  padding:1.25rem;margin-bottom:1rem;
   box-shadow:0 2px 8px rgba(30,80,160,0.06);
 }
 .sec-label{
-  font-size:16px;color:#0f172a;
-  letter-spacing:0.5px;margin-bottom:1rem;font-weight:900;
+  font-size:15px;color:#0f172a;letter-spacing:0.5px;font-weight:900;
   display:flex;align-items:center;gap:6px;
 }
-.sec-label::after{content:'';flex:1;height:1px;background:#e8eef5}
 
-/* ── Decimal pills ── */
-.pills{display:flex;gap:8px}
+/* Settings row */
+.settings-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.settings-label{font-size:13px;color:#4a6080;font-weight:600;white-space:nowrap}
+.pills{display:flex;gap:6px}
 .pill{
-  flex:1;text-align:center;padding:8px 0;border-radius:7px;
+  padding:6px 14px;border-radius:7px;
   font-size:13px;font-weight:600;cursor:pointer;
-  border:1px solid #d0dcea;background:#f4f7fb;
-  color:#7a90aa;transition:all 0.2s;
+  border:1px solid #d0dcea;background:#f4f7fb;color:#7a90aa;
+  transition:all 0.2s;
 }
 .pill:hover{border-color:#93c5fd;color:#2563eb;background:#eff6ff}
 .pill.active{
   background:linear-gradient(135deg,#2563eb,#0ea5e9);
   border-color:transparent;color:#fff;
-  box-shadow:0 3px 10px rgba(37,99,235,0.25);
+  box-shadow:0 2px 8px rgba(37,99,235,0.22);
 }
 
-/* ── Inputs ── */
-.input-row{display:flex;align-items:center;gap:12px;margin-bottom:1rem;position:relative}
-.input-row:last-of-type{margin-bottom:0}
-.inp-label{
-  font-size:14px;color:#4a6080;width:48px;flex-shrink:0;
-  font-style:italic;font-family:'JetBrains Mono',monospace;font-weight:600;
+/* Blank toggle */
+.blank-row{
+  display:flex;align-items:center;justify-content:space-between;
+  cursor:pointer;padding-top:1rem;margin-top:1rem;
+  border-top:1px solid #e8eef5;
 }
-.inp-label sub{font-size:9px;vertical-align:sub;font-style:normal}
-input[type=number]{
-  flex:1;background:#f8fafc;border:1px solid #d0dcea;border-radius:7px;
-  padding:10px 14px;color:#0f172a;font-size:14px;outline:none;
-  transition:border-color 0.2s,box-shadow 0.2s,background 0.2s;
-  font-family:'JetBrains Mono',monospace;-moz-appearance:textfield;
-}
-input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
-input[type=number]:focus{
-  border-color:#2563eb;background:#fff;
-  box-shadow:0 0 0 3px rgba(37,99,235,0.12);
-}
-input[type=number].err{border-color:#dc2626;background:#fff5f5}
-
-/* ── Result cards ── */
-.result-cards{
-  display:grid;grid-template-columns:1fr 1fr;gap:1rem;
-  margin-bottom:0;animation:fadeUp 0.4s ease both;
-}
-.rcard{
-  background:#fff;border:1px solid #d0dcea;border-radius:10px;
-  padding:1.4rem 1rem;text-align:center;
-  box-shadow:0 2px 8px rgba(30,80,160,0.06);
-  position:relative;overflow:hidden;
-}
-.rcard::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:3px;
-}
-.rcard:first-child::before{background:linear-gradient(90deg,#2563eb,#0ea5e9)}
-.rcard:last-child::before{background:linear-gradient(90deg,#059669,#10b981)}
-.rcard-label{font-size:10px;color:#7a90aa;margin-bottom:.5rem;letter-spacing:1px;text-transform:uppercase;font-weight:700}
-.rcard-val{font-size:42px;font-weight:700;line-height:1;letter-spacing:-1px;font-family:'JetBrains Mono',monospace}
-.rcard-val.ts{color:#2563eb}
-.rcard-val.mc{color:#059669}
-.rcard-unit{font-size:13px;color:#94a3b8;margin-top:4px;font-weight:500}
-
-/* ── Blank / toggle ── */
-.blank-toggle{display:flex;align-items:center;justify-content:space-between;cursor:pointer}
-.toggle-text{font-size:14px;color:#1e2b3c;font-weight:600}
-.toggle-sub{font-size:11px;color:#7a90aa;margin-top:3px;letter-spacing:0.3px}
+.blank-row-left .toggle-text{font-size:14px;color:#1e2b3c;font-weight:600}
+.blank-row-left .toggle-sub{font-size:11px;color:#7a90aa;margin-top:2px}
 .toggle-sw{
   width:40px;height:24px;background:#d0dcea;border-radius:12px;
   position:relative;transition:background 0.25s;flex-shrink:0;border:1px solid #c0cfe0;
@@ -158,52 +100,148 @@ input[type=number].err{border-color:#dc2626;background:#fff5f5}
   box-shadow:0 1px 3px rgba(0,0,0,0.15);
 }
 .toggle-sw.on::after{left:18px}
-.blank-content{margin-top:1rem;display:none;max-height:0;opacity:0;overflow:hidden;transition:all 0.3s ease}
-.blank-content.show{display:block;max-height:500px;opacity:1}
+
+.blank-detail{margin-top:1rem;padding-top:1rem;border-top:1px solid #e8eef5}
 .mode-pills{display:flex;gap:6px;margin-bottom:1rem}
 .mode-pill{
-  flex:1;text-align:center;padding:8px 0;border-radius:7px;
+  flex:1;text-align:center;padding:7px 0;border-radius:7px;
   font-size:12px;cursor:pointer;border:1px solid #d0dcea;
   background:#f4f7fb;color:#7a90aa;transition:all 0.2s;font-weight:600;
 }
 .mode-pill:hover{border-color:#93c5fd;color:#2563eb}
 .mode-pill.active{background:#eff6ff;border-color:#2563eb;color:#2563eb}
+
+.inp-row{display:flex;align-items:center;gap:10px;margin-bottom:.75rem}
+.inp-lbl{font-size:12px;color:#4a6080;width:64px;flex-shrink:0;font-family:'JetBrains Mono',monospace;font-weight:600}
+.inp-row input[type=number]{
+  flex:1;background:#f8fafc;border:1px solid #d0dcea;border-radius:7px;
+  padding:8px 12px;color:#0f172a;font-size:13px;outline:none;
+  font-family:'JetBrains Mono',monospace;-moz-appearance:textfield;
+  transition:border-color 0.2s,box-shadow 0.2s;
+}
+.inp-row input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+.inp-row input[type=number]:focus{border-color:#2563eb;background:#fff;box-shadow:0 0 0 3px rgba(37,99,235,0.12)}
+
 .opt-row{
   display:flex;align-items:center;justify-content:space-between;
   background:#f4f7fb;border:1px solid #d0dcea;border-radius:7px;
-  padding:10px 14px;margin-top:1rem;
+  padding:10px 14px;margin-top:.75rem;
 }
 .opt-label{font-size:12px;color:#4a6080;line-height:1.5}
 .checkbox{width:16px;height:16px;accent-color:#2563eb;cursor:pointer;flex-shrink:0}
 
-/* ── Buttons ── */
-.btn-calc{
-  width:100%;padding:13px;border:none;border-radius:8px;
-  background:linear-gradient(135deg,#2563eb,#0ea5e9);
-  color:#fff;font-size:15px;font-weight:700;cursor:pointer;
-  transition:all 0.25s;display:flex;align-items:center;justify-content:center;gap:8px;
-  box-shadow:0 3px 12px rgba(37,99,235,0.28);letter-spacing:0.3px;
+/* Table section */
+.table-toolbar{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:1rem;flex-wrap:wrap;gap:8px;
 }
-.btn-calc:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(37,99,235,0.35)}
-.btn-calc:active{transform:translateY(0);box-shadow:0 2px 8px rgba(37,99,235,0.2)}
-.btn-reset{
-  padding:13px 20px;border:1px solid #d0dcea;border-radius:8px;
-  background:#fff;color:#7a90aa;font-size:15px;cursor:pointer;
-  transition:all 0.25s;display:none;font-weight:600;
+.status-summary{
+  font-size:12px;color:#7a90aa;
+  background:#f4f7fb;border:1px solid #e0e8f0;
+  border-radius:20px;padding:4px 12px;
 }
-.btn-reset:hover{background:#f4f7fb;color:#1e2b3c;border-color:#2563eb}
-.btn-row{display:flex;gap:10px;margin-top:1.5rem}
-.err-msg{
-  font-size:12px;color:#dc2626;margin-top:1rem;display:none;
-  background:#fff5f5;border:1px solid #fecaca;border-radius:7px;
-  padding:10px 14px;
+.toolbar-btns{display:flex;gap:8px}
+.btn-sm{
+  padding:6px 14px;border-radius:7px;font-size:12px;font-weight:600;
+  cursor:pointer;border:1px solid #d0dcea;background:#fff;color:#4a6080;
+  transition:all 0.2s;
+}
+.btn-sm:hover{background:#f4f7fb;border-color:#2563eb;color:#2563eb}
+.btn-sm.export{border-color:#059669;color:#059669}
+.btn-sm.export:hover{background:#f0fdf4;border-color:#059669}
+.btn-sm.danger:hover{background:#fff5f5;border-color:#dc2626;color:#dc2626}
+
+/* Table */
+.table-wrap{overflow-x:auto;margin:-4px -4px 0;padding:4px 4px 0}
+table{width:100%;border-collapse:separate;border-spacing:0}
+thead th{
+  padding:7px 4px;font-size:12px;font-weight:700;color:#7a90aa;
+  text-transform:uppercase;letter-spacing:0.5px;
+  background:#f8fafc;border-bottom:2px solid #e0e8f0;
+  text-align:left;white-space:nowrap;
+}
+thead th:first-child{border-radius:6px 0 0 0;width:24px;text-align:center}
+thead th:last-child{border-radius:0 6px 0 0;width:28px}
+thead th.th-d3{
+  color:#2563eb;
+  position:relative;
+}
+thead th.th-d3::after{
+  content:'กรอกทีหลัง';
+  font-size:8px;font-weight:500;color:#94a3b8;
+  display:block;letter-spacing:0;text-transform:none;margin-top:1px;
 }
 
-/* ── Footer watermark ── */
-.footer{text-align:center;margin-top:1.5rem;padding-bottom:1.5rem}
+tbody tr{transition:background 0.15s}
+tbody tr:hover{background:#f8fafc}
+tbody tr.row-pending td{background:#fffbeb}
+tbody tr.row-pending:hover td{background:#fef9e7}
+tbody tr.row-done td{background:#f0fdf4}
+tbody tr.row-done:hover td{background:#e8faf0}
+tbody tr.row-error td{background:#fff5f5}
+
+td{
+  padding:5px 2px;border-bottom:1px solid #edf1f7;
+  vertical-align:middle;
+}
+td:first-child{text-align:center;font-size:11px;color:#94a3b8;font-weight:600;font-family:'JetBrains Mono',monospace;width:24px}
+td.td-d{padding-left:1px;padding-right:1px}
+
+/* Cell inputs */
+.cell-inp{
+  width:100%;background:transparent;border:1px solid transparent;
+  border-radius:5px;padding:6px 3px;
+  font-size:14px;font-family:'JetBrains Mono',monospace;
+  color:#0f172a;outline:none;transition:all 0.15s;
+  -moz-appearance:textfield;min-width:0;width:76px;
+}
+.cell-inp::-webkit-inner-spin-button{-webkit-appearance:none}
+.cell-inp:hover{border-color:#d0dcea;background:#fff}
+.cell-inp:focus{border-color:#2563eb;background:#fff;box-shadow:0 0 0 3px rgba(37,99,235,0.1)}
+.cell-inp.d3{border-color:#dbeafe;background:#eff6ff}
+.cell-inp.d3:hover{border-color:#93c5fd;background:#fff}
+.cell-inp.d3:focus{border-color:#2563eb;background:#fff;box-shadow:0 0 0 3px rgba(37,99,235,0.1)}
+
+/* Result cells */
+.td-result{width:62px;text-align:right;white-space:nowrap;padding:5px 6px}
+.cell-empty{font-size:13px;color:#cbd5e1;font-family:'JetBrains Mono',monospace}
+.cell-pending{
+  font-size:9px;font-weight:700;color:#d97706;
+  background:#fef3c7;border:1px solid #fde68a;
+  border-radius:20px;padding:2px 5px;letter-spacing:0;
+}
+.cell-ts{font-size:15px;font-weight:700;color:#2563eb;font-family:'JetBrains Mono',monospace}
+.cell-ms{font-size:15px;font-weight:700;color:#059669;font-family:'JetBrains Mono',monospace}
+.cell-error{font-size:10px;color:#dc2626;font-weight:600}
+
+/* Delete btn */
+.btn-del{
+  width:22px;height:22px;border-radius:50%;border:1px solid #e0e8f0;
+  background:transparent;color:#cbd5e1;font-size:14px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.15s;line-height:1;
+}
+.btn-del:hover{background:#fee2e2;border-color:#fca5a5;color:#dc2626}
+
+/* Add row button */
+.btn-add{
+  width:100%;margin-top:10px;padding:10px;
+  border:2px dashed #c8d9ed;border-radius:8px;
+  background:transparent;color:#7a90aa;font-size:13px;font-weight:600;
+  cursor:pointer;transition:all 0.2s;
+}
+.btn-add:hover{border-color:#2563eb;color:#2563eb;background:#eff6ff}
+
+/* Saved badge */
+.saved-badge{
+  font-size:11px;color:#059669;
+  display:none;align-items:center;gap:4px;
+}
+.saved-badge.show{display:inline-flex}
+
+/* Footer */
+.footer{text-align:center;margin-top:1.5rem;padding-bottom:1rem}
 .footer-text{font-size:10px;color:#b0bfcc;letter-spacing:0.5px}
-
-@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 </style>
 </head>
 <body>
@@ -215,86 +253,52 @@ input[type=number].err{border-color:#dc2626;background:#fff5f5}
   </a>
 
   <div class="header">
-    <div class="lab-bar">
-      <div class="lab-icon">
-        <svg viewBox="0 0 24 24"><rect x='3' y='2' width='18' height='20' rx='2' fill='none' stroke='white' stroke-width='1.5'/><rect x='5' y='4' width='14' height='5' rx='1' fill='white' opacity='0.3'/><rect x='5' y='11' width='4' height='3' rx='0.8' fill='white' opacity='0.5'/><rect x='10' y='11' width='4' height='3' rx='0.8' fill='white' opacity='0.5'/><rect x='15' y='11' width='4' height='3' rx='0.8' fill='white' opacity='0.7'/><rect x='5' y='16' width='4' height='3' rx='0.8' fill='white' opacity='0.5'/><rect x='10' y='16' width='4' height='3' rx='0.8' fill='white' opacity='0.5'/><rect x='15' y='16' width='4' height='6.5' rx='0.8' fill='white' opacity='0.7'/></svg>
-      </div>
-      <span class="lab-tag">Laboratory</span>
-    </div>
     <div class="title">TS &amp; <span>MS</span> Calculator</div>
     <div class="subtitle">Total Solid · Moisture Content</div>
   </div>
 
+  <!-- Settings -->
   <div class="section">
-    <div class="sec-label">ทศนิยม</div>
-    <div class="pills" id="dp-pills">
-      <div class="pill active" data-dp="2">2</div>
-      <div class="pill" data-dp="3">3</div>
-      <div class="pill" data-dp="4">4</div>
-      <div class="pill" data-dp="5">5</div>
+    <div class="settings-row">
+      <span class="settings-label">ทศนิยม</span>
+      <div class="pills" id="dp-pills">
+        <div class="pill" data-dp="2">2</div>
+        <div class="pill" data-dp="3">3</div>
+        <div class="pill" data-dp="4">4</div>
+        <div class="pill" data-dp="5">5</div>
+      </div>
+      <span class="saved-badge" id="saved-badge">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        บันทึกแล้ว
+      </span>
     </div>
-  </div>
 
-  <div class="section">
-    <div class="sec-label">Input</div>
-    <div class="input-row">
-      <div class="inp-label">D<sub>1</sub></div>
-      <input type="number" id="d1" placeholder="0" step="any">
-    </div>
-    <div class="input-row">
-      <div class="inp-label">D<sub>2</sub></div>
-      <input type="number" id="d2" placeholder="0" step="any">
-    </div>
-    <div class="input-row">
-      <div class="inp-label">D<sub>3</sub></div>
-      <input type="number" id="d3" placeholder="0" step="any">
-    </div>
-    <div class="err-msg" id="err-main"></div>
-    <div class="btn-row">
-      <button class="btn-calc" id="btn-calc">⬇ คำนวณ</button>
-      <button class="btn-reset" id="btn-reset">↺ ล้างค่า</button>
-    </div>
-  </div>
-
-  <div class="result-cards" id="result-section" style="display:none">
-    <div class="rcard">
-      <div class="rcard-label">TS (Total Solid)</div>
-      <div class="rcard-val ts" id="ts-val">—</div>
-      <div class="rcard-unit">%</div>
-    </div>
-    <div class="rcard">
-      <div class="rcard-label">MS (Moisture)</div>
-      <div class="rcard-val mc" id="ms-val">—</div>
-      <div class="rcard-unit">%</div>
-    </div>
-  </div>
-
-  <div class="section" id="blank-section" style="display:none">
-    <div class="blank-toggle" id="blank-toggle">
-      <div>
-        <div class="toggle-text">Blank Settings</div>
+    <!-- Blank toggle -->
+    <div class="blank-row" id="blank-row">
+      <div class="blank-row-left">
+        <div class="toggle-text">Blank Correction</div>
         <div class="toggle-sub">B_diff · B_start · B_end</div>
       </div>
       <div class="toggle-sw" id="blank-sw"></div>
     </div>
-    <div class="blank-content" id="blank-content">
+    <div class="blank-detail" id="blank-detail" style="display:none">
       <div class="mode-pills">
         <div class="mode-pill active" data-mode="direct">กรอก B_diff</div>
         <div class="mode-pill" data-mode="calc">คำนวณจาก B_start/B_end</div>
       </div>
       <div id="blank-direct">
-        <div class="input-row">
-          <div class="inp-label" style="font-size:12px;width:60px">B_diff</div>
+        <div class="inp-row">
+          <div class="inp-lbl">B_diff</div>
           <input type="number" id="bdiff" placeholder="0" step="any">
         </div>
       </div>
-      <div id="blank-calc" style="display:none">
-        <div class="input-row">
-          <div class="inp-label" style="font-size:12px;width:60px">B_start</div>
+      <div id="blank-calc-inputs" style="display:none">
+        <div class="inp-row">
+          <div class="inp-lbl">B_start</div>
           <input type="number" id="bstart" placeholder="0" step="any">
         </div>
-        <div class="input-row">
-          <div class="inp-label" style="font-size:12px;width:60px">B_end</div>
+        <div class="inp-row">
+          <div class="inp-lbl">B_end</div>
           <input type="number" id="bend" placeholder="0" step="any">
         </div>
       </div>
@@ -305,156 +309,333 @@ input[type=number].err{border-color:#dc2626;background:#fff5f5}
     </div>
   </div>
 
+  <!-- Table -->
+  <div class="section">
+    <div class="table-toolbar">
+      <span class="status-summary" id="status-summary">—</span>
+      <div class="toolbar-btns">
+        <button class="btn-sm export" id="btn-export">↓ Export CSV</button>
+        <button class="btn-sm danger" id="btn-clear-all">ล้างทั้งหมด</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>D₁ (ภาชนะ)</th>
+            <th>D₂ (ก่อนอบ)</th>
+            <th class="th-d3">D₃ (หลังอบ)</th>
+            <th style="text-align:right">TS%</th>
+            <th style="text-align:right">MS%</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
+    <button class="btn-add" id="btn-add">+ เพิ่มตัวอย่าง</button>
+  </div>
+
   <div class="footer">
-    <div class="footer-text">Single Sample · Bankers Rounding</div>
+    <div class="footer-text">Bankers Rounding · บันทึกอัตโนมัติในเบราว์เซอร์นี้</div>
   </div>
 </div>
 
 <script>
-let dp = 2;
-let blankOn = false;
-let blankMode = 'direct';
-let calculated = false;
+const STORAGE_KEY = 'msts_v2';
+let saveTimer = null;
 
-function bankersRound(num, decimals) {
-  const factor = Math.pow(10, decimals);
-  const shifted = num * factor;
-  const floor = Math.floor(shifted);
-  const diff = shifted - floor;
-  if (Math.abs(diff - 0.5) < 1e-10) {
-    return (floor % 2 === 0 ? floor : floor + 1) / factor;
+let state = {
+  dp: 2,
+  rows: [],
+  blank: { on: false, mode: 'direct', bdiff: '', bstart: '', bend: '', negOpt: false }
+};
+
+/* ── Persistence ── */
+function loadState() {
+  try {
+    const s = localStorage.getItem(STORAGE_KEY);
+    if (s) state = Object.assign(state, JSON.parse(s));
+  } catch(e) {}
+  if (!state.rows.length) state.rows = [newRow(), newRow(), newRow()];
+}
+
+function saveState() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
+  showSaved();
+}
+
+function saveDebounced() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveState, 400);
+}
+
+function showSaved() {
+  const el = document.getElementById('saved-badge');
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), 1800);
+}
+
+/* ── Core ── */
+function newRow() {
+  return { id: Date.now() + '_' + Math.random().toString(36).slice(2), d1:'', d2:'', d3:'' };
+}
+
+function bankersRound(num, dec) {
+  const f = Math.pow(10, dec);
+  const s = num * f, fl = Math.floor(s), diff = s - fl;
+  if (Math.abs(diff - 0.5) < 1e-10) return (fl % 2 === 0 ? fl : fl + 1) / f;
+  return Math.round(s) / f;
+}
+function fmt(n) { return bankersRound(n, state.dp).toFixed(state.dp); }
+
+function getBlankDiff() {
+  if (!state.blank.on) return 0;
+  let b = 0;
+  if (state.blank.mode === 'direct') {
+    b = state.blank.bdiff !== '' ? parseFloat(state.blank.bdiff) || 0 : 0;
+  } else {
+    const bs = parseFloat(state.blank.bstart), be = parseFloat(state.blank.bend);
+    b = (!isNaN(bs) && !isNaN(be)) ? be - bs : 0;
   }
-  return Math.round(shifted) / factor;
+  if (!state.blank.negOpt && b < 0) b = 0;
+  return b;
 }
 
-function fmt(n) {
-  return bankersRound(n, dp).toFixed(dp);
+function calcRow(row) {
+  const d1 = parseFloat(row.d1), d2 = parseFloat(row.d2), d3 = parseFloat(row.d3);
+  if (isNaN(d1) || isNaN(d2) || row.d1 === '' || row.d2 === '') return { status: 'empty' };
+  if (isNaN(d3) || row.d3 === '') return { status: 'pending' };
+  const fresh = d2 - d1, dry = d3 - d1;
+  if (fresh <= 0) return { status: 'error', msg: 'D₂ ≤ D₁' };
+  if (dry < 0)   return { status: 'error', msg: 'D₃ < D₁' };
+  const ts = ((dry - getBlankDiff()) / fresh) * 100;
+  return { status: 'ok', ts, ms: 100 - ts };
 }
 
+/* ── Render ── */
+function renderTable() {
+  const tbody = document.getElementById('table-body');
+  tbody.innerHTML = state.rows.map((row, i) => rowHTML(row, i)).join('');
+  updateSummary();
+}
+
+function rowHTML(row, i) {
+  const r = calcRow(row);
+  let tsCell = '', msCell = '', rowClass = '';
+
+  if (r.status === 'empty') {
+    tsCell = '<span class="cell-empty">—</span>';
+    msCell = '<span class="cell-empty">—</span>';
+  } else if (r.status === 'pending') {
+    tsCell = '<span class="cell-pending">รอ D₃</span>';
+    msCell = '<span class="cell-pending">รอ D₃</span>';
+    rowClass = 'row-pending';
+  } else if (r.status === 'error') {
+    tsCell = `<span class="cell-error">${r.msg}</span>`;
+    msCell = '<span class="cell-error">—</span>';
+    rowClass = 'row-error';
+  } else {
+    tsCell = `<span class="cell-ts">${fmt(r.ts)}</span>`;
+    msCell = `<span class="cell-ms">${fmt(r.ms)}</span>`;
+    rowClass = 'row-done';
+  }
+
+  return `<tr class="${rowClass}" data-id="${row.id}">
+    <td>${i + 1}</td>
+    <td class="td-d"><input class="cell-inp" type="number" data-id="${row.id}" data-field="d1" value="${row.d1}" placeholder="0.0000" step="any"></td>
+    <td class="td-d"><input class="cell-inp" type="number" data-id="${row.id}" data-field="d2" value="${row.d2}" placeholder="0.0000" step="any"></td>
+    <td class="td-d"><input class="cell-inp d3" type="number" data-id="${row.id}" data-field="d3" value="${row.d3}" placeholder="—" step="any"></td>
+    <td class="td-result">${tsCell}</td>
+    <td class="td-result">${msCell}</td>
+    <td><button class="btn-del" data-id="${row.id}" title="ลบแถว">×</button></td>
+  </tr>`;
+}
+
+function updateRowResult(id) {
+  const row = state.rows.find(r => r.id === id);
+  const tr  = document.querySelector(`tr[data-id="${id}"]`);
+  if (!row || !tr) return;
+
+  const r = calcRow(row);
+  const tds = tr.querySelectorAll('.td-result');
+  tr.className = tr.className.replace(/row-\w+/g, '').trim();
+
+  let tsCell = '', msCell = '';
+  if (r.status === 'empty') {
+    tsCell = '<span class="cell-empty">—</span>';
+    msCell = '<span class="cell-empty">—</span>';
+  } else if (r.status === 'pending') {
+    tsCell = '<span class="cell-pending">รอ D₃</span>';
+    msCell = '<span class="cell-pending">รอ D₃</span>';
+    tr.classList.add('row-pending');
+  } else if (r.status === 'error') {
+    tsCell = `<span class="cell-error">${r.msg}</span>`;
+    msCell = '<span class="cell-error">—</span>';
+    tr.classList.add('row-error');
+  } else {
+    tsCell = `<span class="cell-ts">${fmt(r.ts)}</span>`;
+    msCell = `<span class="cell-ms">${fmt(r.ms)}</span>`;
+    tr.classList.add('row-done');
+  }
+  tds[0].innerHTML = tsCell;
+  tds[1].innerHTML = msCell;
+  updateSummary();
+}
+
+function updateSummary() {
+  const results = state.rows.map(r => calcRow(r).status);
+  const total   = state.rows.length;
+  const done    = results.filter(s => s === 'ok').length;
+  const pending = results.filter(s => s === 'pending').length;
+  document.getElementById('status-summary').textContent =
+    `ทั้งหมด ${total} | เสร็จ ${done} | รอ D₃ ${pending}`;
+}
+
+/* ── Events: table ── */
+document.getElementById('table-body').addEventListener('focus', e => {
+  if (!e.target.classList.contains('cell-inp')) return;
+  setTimeout(() => e.target.scrollIntoView({ block: 'center', behavior: 'smooth' }), 300);
+}, true);
+
+document.getElementById('table-body').addEventListener('input', e => {
+  const inp = e.target;
+  if (!inp.classList.contains('cell-inp')) return;
+  const row = state.rows.find(r => r.id === inp.dataset.id);
+  if (!row) return;
+  row[inp.dataset.field] = inp.value;
+  updateRowResult(inp.dataset.id);
+  saveDebounced();
+});
+
+document.getElementById('table-body').addEventListener('keydown', e => {
+  if (e.key !== 'Enter' && e.key !== 'Tab') return;
+  if (e.key === 'Tab') return; // let browser handle natural tab
+  e.preventDefault();
+  const inputs = [...document.querySelectorAll('#table-body .cell-inp')];
+  const idx = inputs.indexOf(e.target);
+  if (idx !== -1 && idx < inputs.length - 1) inputs[idx + 1].focus();
+  else if (idx === inputs.length - 1) {
+    // Enter on last cell → add row and focus its D1
+    addRow();
+  }
+});
+
+document.getElementById('table-body').addEventListener('click', e => {
+  if (!e.target.classList.contains('btn-del')) return;
+  if (state.rows.length <= 1) return;
+  state.rows = state.rows.filter(r => r.id !== e.target.dataset.id);
+  saveState();
+  renderTable();
+});
+
+function addRow() {
+  state.rows.push(newRow());
+  saveState();
+  renderTable();
+  const inputs = document.querySelectorAll('#table-body .cell-inp[data-field="d1"]');
+  if (inputs.length) inputs[inputs.length - 1].focus();
+}
+
+document.getElementById('btn-add').addEventListener('click', addRow);
+
+/* ── Events: toolbar ── */
+document.getElementById('btn-export').addEventListener('click', () => {
+  let csv = '#,D1,D2,D3,TS%,MS%\n';
+  state.rows.forEach((row, i) => {
+    const r = calcRow(row);
+    const ts = r.status === 'ok' ? fmt(r.ts) : '';
+    const ms = r.status === 'ok' ? fmt(r.ms) : '';
+    csv += `${i+1},${row.d1},${row.d2},${row.d3},${ts},${ms}\n`;
+  });
+  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `TS_MS_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById('btn-clear-all').addEventListener('click', () => {
+  if (!confirm('ล้างข้อมูลทั้งหมดและเริ่มใหม่?')) return;
+  state.rows = [newRow(), newRow(), newRow()];
+  saveState();
+  renderTable();
+});
+
+/* ── Events: settings ── */
 document.querySelectorAll('#dp-pills .pill').forEach(p => {
   p.addEventListener('click', () => {
     document.querySelectorAll('#dp-pills .pill').forEach(x => x.classList.remove('active'));
     p.classList.add('active');
-    dp = parseInt(p.dataset.dp);
-    if (calculated) calc();
+    state.dp = parseInt(p.dataset.dp);
+    saveState();
+    state.rows.forEach(r => updateRowResult(r.id));
   });
 });
 
-document.getElementById('blank-section').addEventListener('click', (e) => {
-  if (e.target === document.getElementById('blank-toggle') ||
-      e.target === document.getElementById('blank-sw') ||
-      e.target.parentElement === document.getElementById('blank-toggle')) {
-    blankOn = !blankOn;
-    document.getElementById('blank-sw').classList.toggle('on', blankOn);
-    document.getElementById('blank-content').classList.toggle('show', blankOn);
-  }
+document.getElementById('blank-row').addEventListener('click', () => {
+  state.blank.on = !state.blank.on;
+  document.getElementById('blank-sw').classList.toggle('on', state.blank.on);
+  document.getElementById('blank-detail').style.display = state.blank.on ? 'block' : 'none';
+  saveState();
+  state.rows.forEach(r => updateRowResult(r.id));
 });
 
 document.querySelectorAll('.mode-pill').forEach(p => {
   p.addEventListener('click', () => {
     document.querySelectorAll('.mode-pill').forEach(x => x.classList.remove('active'));
     p.classList.add('active');
-    blankMode = p.dataset.mode;
-    document.getElementById('blank-direct').style.display = blankMode === 'direct' ? '' : 'none';
-    document.getElementById('blank-calc').style.display = blankMode === 'calc' ? '' : 'none';
+    state.blank.mode = p.dataset.mode;
+    document.getElementById('blank-direct').style.display         = state.blank.mode === 'direct' ? '' : 'none';
+    document.getElementById('blank-calc-inputs').style.display    = state.blank.mode === 'calc'   ? '' : 'none';
+    saveState();
+    state.rows.forEach(r => updateRowResult(r.id));
   });
 });
 
-['d1','d2','d3','bdiff','bstart','bend'].forEach(id => {
+['bdiff','bstart','bend'].forEach(id => {
   const el = document.getElementById(id);
-  if (el) {
-    el.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') { e.preventDefault(); calc(); }
-    });
-  }
+  el.addEventListener('input', () => {
+    state.blank[id] = el.value;
+    saveDebounced();
+    state.rows.forEach(r => updateRowResult(r.id));
+  });
 });
 
-document.getElementById('btn-calc').addEventListener('click', calc);
-document.getElementById('btn-reset').addEventListener('click', reset);
+document.getElementById('neg-opt').addEventListener('change', e => {
+  state.blank.negOpt = e.target.checked;
+  saveState();
+  state.rows.forEach(r => updateRowResult(r.id));
+});
 
-function calc() {
-  const d1v = document.getElementById('d1').value;
-  const d2v = document.getElementById('d2').value;
-  const d3v = document.getElementById('d3').value;
-  const errEl = document.getElementById('err-main');
+/* ── Init ── */
+loadState();
 
-  [d1v,d2v,d3v].forEach((v,i) => {
-    document.getElementById('d'+(i+1)).classList.toggle('err', v === '' || isNaN(parseFloat(v)));
-  });
+// Apply saved dp
+document.querySelectorAll('#dp-pills .pill').forEach(p =>
+  p.classList.toggle('active', parseInt(p.dataset.dp) === state.dp)
+);
 
-  if (d1v===''||d2v===''||d3v===''||isNaN(parseFloat(d1v))||isNaN(parseFloat(d2v))||isNaN(parseFloat(d3v))) {
-    errEl.textContent = '⚠ กรุณากรอก d₁, d₂, d₃ ให้ครบ';
-    errEl.style.display = 'block';
-    return;
-  }
-  errEl.style.display = 'none';
-
-  let d1 = parseFloat(d1v), d2 = parseFloat(d2v), d3 = parseFloat(d3v);
-  const fresh = d2 - d1;
-  const dry   = d3 - d1;
-
-  if (fresh <= 0) {
-    errEl.textContent = '⚠ ค่า d₂ ต้องมากกว่า d₁';
-    errEl.style.display = 'block';
-    return;
-  }
-  if (dry < 0) {
-    errEl.textContent = '⚠ ค่า d₃ ไม่ควรน้อยกว่า d₁';
-    errEl.style.display = 'block';
-    return;
-  }
-
-  let bdiff = 0;
-  if (blankOn) {
-    if (blankMode === 'direct') {
-      const bv = document.getElementById('bdiff').value;
-      bdiff = bv !== '' ? parseFloat(bv) : 0;
-    } else {
-      const bsv = document.getElementById('bstart').value;
-      const bev = document.getElementById('bend').value;
-      if (bsv===''||bev===''||isNaN(parseFloat(bsv))||isNaN(parseFloat(bev))) {
-        errEl.textContent = '⚠ กรุณากรอก B_start และ B_end';
-        errEl.style.display = 'block';
-        return;
-      }
-      bdiff = parseFloat(bev) - parseFloat(bsv);
-    }
-    if (!document.getElementById('neg-opt').checked && bdiff < 0) bdiff = 0;
-  }
-
-  const ts = ((dry - bdiff) / fresh) * 100;
-  const ms = 100 - ts;
-
-  document.getElementById('ts-val').textContent = fmt(ts);
-  document.getElementById('ms-val').textContent = fmt(ms);
-
-  const rs = document.getElementById('result-section');
-  rs.style.display = 'grid';
-  rs.classList.remove('fadeUp');
-  void rs.offsetWidth;
-  rs.style.animation = 'none';
-  void rs.offsetWidth;
-  rs.style.animation = '';
-
-  document.getElementById('blank-section').style.display = 'block';
-  document.getElementById('btn-reset').style.display = 'block';
-  calculated = true;
-
-  setTimeout(() => { rs.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 100);
+// Apply saved blank
+if (state.blank.on) {
+  document.getElementById('blank-sw').classList.add('on');
+  document.getElementById('blank-detail').style.display = 'block';
 }
+document.querySelectorAll('.mode-pill').forEach(p =>
+  p.classList.toggle('active', p.dataset.mode === state.blank.mode)
+);
+document.getElementById('blank-direct').style.display      = state.blank.mode === 'direct' ? '' : 'none';
+document.getElementById('blank-calc-inputs').style.display = state.blank.mode === 'calc'   ? '' : 'none';
+if (state.blank.bdiff)  document.getElementById('bdiff').value  = state.blank.bdiff;
+if (state.blank.bstart) document.getElementById('bstart').value = state.blank.bstart;
+if (state.blank.bend)   document.getElementById('bend').value   = state.blank.bend;
+document.getElementById('neg-opt').checked = state.blank.negOpt;
 
-function reset() {
-  ['d1','d2','d3','bdiff','bstart','bend'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) { el.value = ''; el.classList.remove('err'); }
-  });
-  document.getElementById('result-section').style.display = 'none';
-  document.getElementById('btn-reset').style.display = 'none';
-  document.getElementById('err-main').style.display = 'none';
-  document.getElementById('ts-val').textContent = '—';
-  document.getElementById('ms-val').textContent = '—';
-  calculated = false;
-}
+renderTable();
 </script>
 </body>
 </html>
