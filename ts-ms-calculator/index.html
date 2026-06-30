@@ -160,7 +160,7 @@ thead th{
   background:#f8fafc;border-bottom:2px solid #e0e8f0;
   text-align:left;white-space:nowrap;
 }
-thead th:first-child{border-radius:6px 0 0 0;width:24px;text-align:center}
+thead th:first-child{border-radius:6px 0 0 0;width:76px;text-align:left}
 thead th:last-child{border-radius:0 6px 0 0;width:28px}
 thead th.th-d3{
   color:#2563eb;
@@ -184,7 +184,7 @@ td{
   padding:5px 2px;border-bottom:1px solid #edf1f7;
   vertical-align:middle;
 }
-td:first-child{text-align:center;font-size:15px;color:#dc2626;font-weight:800;font-family:'JetBrains Mono',monospace;width:24px}
+td:first-child{text-align:left;vertical-align:middle;width:76px;padding:4px 2px}
 td.td-d{padding-left:1px;padding-right:1px}
 
 /* Cell inputs */
@@ -242,6 +242,21 @@ td.td-d{padding-left:1px;padding-right:1px}
 /* Footer */
 .footer{text-align:center;margin-top:1.5rem;padding-bottom:1rem}
 .footer-text{font-size:10px;color:#b0bfcc;letter-spacing:0.5px}
+
+/* Per-row plate input */
+.row-num-cell{display:flex;align-items:center;gap:3px}
+.row-num{font-size:14px;color:#dc2626;font-weight:800;font-family:'JetBrains Mono',monospace;flex-shrink:0}
+.sep{font-size:10px;color:#cbd5e1;flex-shrink:0}
+.plate-inp-row{
+  width:32px;background:transparent;border:1px solid transparent;
+  border-radius:4px;padding:2px 2px;
+  font-size:12px;font-family:'JetBrains Mono',monospace;
+  color:#475569;outline:none;-moz-appearance:textfield;text-align:center;
+  transition:all 0.15s;
+}
+.plate-inp-row::-webkit-inner-spin-button{-webkit-appearance:none}
+.plate-inp-row:hover{border-color:#d0dcea;background:#fff}
+.plate-inp-row:focus{border-color:#2563eb;background:#fff;box-shadow:0 0 0 2px rgba(37,99,235,0.1)}
 </style>
 </head>
 <body>
@@ -271,6 +286,15 @@ td.td-d{padding-left:1px;padding-right:1px}
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         บันทึกแล้ว
       </span>
+    </div>
+
+    <!-- Display toggle -->
+    <div class="settings-row" style="margin-top:.75rem;padding-top:.75rem;border-top:1px solid #e8eef5">
+      <span class="settings-label">แสดงผล</span>
+      <div class="pills">
+        <div class="pill active" id="pill-ts">TS%</div>
+        <div class="pill active" id="pill-ms">MS%</div>
+      </div>
     </div>
 
     <!-- Blank toggle -->
@@ -320,17 +344,7 @@ td.td-d{padding-left:1px;padding-right:1px}
     </div>
     <div class="table-wrap">
       <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>D₁ (ภาชนะ)</th>
-            <th>D₂ (ก่อนอบ)</th>
-            <th class="th-d3">D₃ (หลังอบ)</th>
-            <th style="text-align:right">TS%</th>
-            <th style="text-align:right">MS%</th>
-            <th></th>
-          </tr>
-        </thead>
+        <thead id="table-head"></thead>
         <tbody id="table-body"></tbody>
       </table>
     </div>
@@ -349,6 +363,8 @@ let saveTimer = null;
 let state = {
   dp: 2,
   rows: [],
+  displayTS: true,
+  displayMS: false,
   blank: { on: false, mode: 'direct', bdiff: '', bstart: '', bend: '', negOpt: false }
 };
 
@@ -359,6 +375,7 @@ function loadState() {
     if (s) state = Object.assign(state, JSON.parse(s));
   } catch(e) {}
   if (!state.rows.length) state.rows = [newRow(), newRow(), newRow()];
+  state.rows.forEach(r => { if (r.plate === undefined) r.plate = ''; });
 }
 
 function saveState() {
@@ -380,7 +397,7 @@ function showSaved() {
 
 /* ── Core ── */
 function newRow() {
-  return { id: Date.now() + '_' + Math.random().toString(36).slice(2), d1:'', d2:'', d3:'' };
+  return { id: Date.now() + '_' + Math.random().toString(36).slice(2), plate:'', d1:'', d2:'', d3:'' };
 }
 
 function bankersRound(num, dec) {
@@ -416,7 +433,15 @@ function calcRow(row) {
 }
 
 /* ── Render ── */
+function renderHeader() {
+  const tsHead = state.displayTS ? '<th style="text-align:right">TS%</th>' : '';
+  const msHead = state.displayMS ? '<th style="text-align:right">MS%</th>' : '';
+  document.getElementById('table-head').innerHTML =
+    `<tr><th><span style="color:#dc2626">#</span><span style="color:#cbd5e1;font-size:10px;font-weight:400"> / Plate</span></th><th>D₁ (ภาชนะ)</th><th>D₂ (ก่อนอบ)</th><th class="th-d3">D₃ (หลังอบ)</th>${tsHead}${msHead}<th></th></tr>`;
+}
+
 function renderTable() {
+  renderHeader();
   const tbody = document.getElementById('table-body');
   tbody.innerHTML = state.rows.map((row, i) => rowHTML(row, i)).join('');
   updateSummary();
@@ -443,13 +468,14 @@ function rowHTML(row, i) {
     rowClass = 'row-done';
   }
 
+  const tsCol = state.displayTS ? `<td class="td-result td-ts">${tsCell}</td>` : '';
+  const msCol = state.displayMS ? `<td class="td-result td-ms">${msCell}</td>` : '';
   return `<tr class="${rowClass}" data-id="${row.id}">
-    <td>${i + 1}</td>
+    <td><div class="row-num-cell"><span class="row-num">${i + 1}</span><span class="sep">/</span><input class="plate-inp-row" type="number" data-id="${row.id}" data-field="plate" value="${row.plate}" placeholder="—" min="1" max="999"></div></td>
     <td class="td-d"><input class="cell-inp" type="number" data-id="${row.id}" data-field="d1" value="${row.d1}" placeholder="0.0000" step="any"></td>
     <td class="td-d"><input class="cell-inp" type="number" data-id="${row.id}" data-field="d2" value="${row.d2}" placeholder="0.0000" step="any"></td>
     <td class="td-d"><input class="cell-inp d3" type="number" data-id="${row.id}" data-field="d3" value="${row.d3}" placeholder="—" step="any"></td>
-    <td class="td-result">${tsCell}</td>
-    <td class="td-result">${msCell}</td>
+    ${tsCol}${msCol}
     <td><button class="btn-del" data-id="${row.id}" title="ลบแถว">×</button></td>
   </tr>`;
 }
@@ -460,7 +486,8 @@ function updateRowResult(id) {
   if (!row || !tr) return;
 
   const r = calcRow(row);
-  const tds = tr.querySelectorAll('.td-result');
+  const tdTs = tr.querySelector('.td-ts');
+  const tdMs = tr.querySelector('.td-ms');
   tr.className = tr.className.replace(/row-\w+/g, '').trim();
 
   let tsCell = '', msCell = '';
@@ -480,8 +507,8 @@ function updateRowResult(id) {
     msCell = `<span class="cell-ms">${fmt(r.ms)}</span>`;
     tr.classList.add('row-done');
   }
-  tds[0].innerHTML = tsCell;
-  tds[1].innerHTML = msCell;
+  if (tdTs) tdTs.innerHTML = tsCell;
+  if (tdMs) tdMs.innerHTML = msCell;
   updateSummary();
 }
 
@@ -502,11 +529,13 @@ document.getElementById('table-body').addEventListener('focus', e => {
 
 document.getElementById('table-body').addEventListener('input', e => {
   const inp = e.target;
-  if (!inp.classList.contains('cell-inp')) return;
+  const isCell = inp.classList.contains('cell-inp');
+  const isPlate = inp.classList.contains('plate-inp-row');
+  if (!isCell && !isPlate) return;
   const row = state.rows.find(r => r.id === inp.dataset.id);
   if (!row) return;
   row[inp.dataset.field] = inp.value;
-  updateRowResult(inp.dataset.id);
+  if (isCell) updateRowResult(inp.dataset.id);
   saveDebounced();
 });
 
@@ -543,13 +572,22 @@ document.getElementById('btn-add').addEventListener('click', addRow);
 
 /* ── Events: toolbar ── */
 document.getElementById('btn-export').addEventListener('click', () => {
-  let csv = '#,D1,D2,D3,TS%,MS%\n';
+  const colHeaders = ['#','Plate','D1','D2','D3'];
+  if (state.displayTS) colHeaders.push('TS%');
+  if (state.displayMS) colHeaders.push('MS%');
+
+  let csv = colHeaders.join(',') + '\n';
+
   state.rows.forEach((row, i) => {
     const r = calcRow(row);
     const ts = r.status === 'ok' ? fmt(r.ts) : '';
     const ms = r.status === 'ok' ? fmt(r.ms) : '';
-    csv += `${i+1},${row.d1},${row.d2},${row.d3},${ts},${ms}\n`;
+    const vals = [`${i+1}`, row.plate, row.d1, row.d2, row.d3];
+    if (state.displayTS) vals.push(ts);
+    if (state.displayMS) vals.push(ms);
+    csv += vals.join(',') + '\n';
   });
+
   const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -576,6 +614,23 @@ document.querySelectorAll('#dp-pills .pill').forEach(p => {
     state.rows.forEach(r => updateRowResult(r.id));
   });
 });
+
+document.getElementById('pill-ts').addEventListener('click', () => {
+  if (state.displayTS && !state.displayMS) return;
+  state.displayTS = !state.displayTS;
+  document.getElementById('pill-ts').classList.toggle('active', state.displayTS);
+  saveState();
+  renderTable();
+});
+
+document.getElementById('pill-ms').addEventListener('click', () => {
+  if (state.displayMS && !state.displayTS) return;
+  state.displayMS = !state.displayMS;
+  document.getElementById('pill-ms').classList.toggle('active', state.displayMS);
+  saveState();
+  renderTable();
+});
+
 
 document.getElementById('blank-row').addEventListener('click', () => {
   state.blank.on = !state.blank.on;
@@ -619,6 +674,11 @@ loadState();
 document.querySelectorAll('#dp-pills .pill').forEach(p =>
   p.classList.toggle('active', parseInt(p.dataset.dp) === state.dp)
 );
+
+// Apply saved display toggles
+document.getElementById('pill-ts').classList.toggle('active', state.displayTS);
+document.getElementById('pill-ms').classList.toggle('active', state.displayMS);
+
 
 // Apply saved blank
 if (state.blank.on) {
