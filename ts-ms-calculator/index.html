@@ -162,15 +162,7 @@ thead th{
 }
 thead th:first-child{border-radius:6px 0 0 0;width:76px;text-align:left}
 thead th:last-child{border-radius:0 6px 0 0;width:28px}
-thead th.th-d3{
-  color:#2563eb;
-  position:relative;
-}
-thead th.th-d3::after{
-  content:'กรอกทีหลัง';
-  font-size:8px;font-weight:500;color:#94a3b8;
-  display:block;letter-spacing:0;text-transform:none;margin-top:1px;
-}
+thead th.th-d3{color:#2563eb}
 
 tbody tr{transition:background 0.15s}
 tbody tr:hover{background:#f8fafc}
@@ -193,7 +185,7 @@ td.td-d{padding-left:1px;padding-right:1px}
   border-radius:5px;padding:6px 3px;
   font-size:14px;font-family:'JetBrains Mono',monospace;
   color:#0f172a;outline:none;transition:all 0.15s;
-  -moz-appearance:textfield;min-width:0;width:76px;
+  -moz-appearance:textfield;min-width:0;width:68px;
 }
 .cell-inp::-webkit-inner-spin-button{-webkit-appearance:none}
 .cell-inp:hover{border-color:#d0dcea;background:#fff}
@@ -436,8 +428,9 @@ function calcRow(row) {
 function renderHeader() {
   const tsHead = state.displayTS ? '<th style="text-align:right">TS%</th>' : '';
   const msHead = state.displayMS ? '<th style="text-align:right">MS%</th>' : '';
+  const sub = (t) => `<span style="display:block;font-size:8px;font-weight:400;color:#94a3b8;text-transform:none;letter-spacing:0;margin-top:1px">${t}</span>`;
   document.getElementById('table-head').innerHTML =
-    `<tr><th><span style="color:#dc2626">#</span><span style="color:#cbd5e1;font-size:10px;font-weight:400"> / Plate</span></th><th>D₁ (ภาชนะ)</th><th>D₂ (ก่อนอบ)</th><th class="th-d3">D₃ (หลังอบ)</th>${tsHead}${msHead}<th></th></tr>`;
+    `<tr><th><span style="color:#dc2626">#</span><span style="color:#cbd5e1;font-size:10px;font-weight:400"> / Plate</span></th><th>D₁${sub('ภาชนะ')}</th><th>D₂${sub('ก่อนอบ')}</th><th class="th-d3" style="color:#2563eb">D₃${sub('หลังอบ — กรอกทีหลัง')}</th>${tsHead}${msHead}<th></th></tr>`;
 }
 
 function renderTable() {
