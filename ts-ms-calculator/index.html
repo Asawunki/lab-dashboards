@@ -236,7 +236,7 @@ td.td-d{padding-left:1px;padding-right:1px}
 .footer-text{font-size:10px;color:#b0bfcc;letter-spacing:0.5px}
 
 /* Per-row plate input */
-.row-num-cell{display:flex;align-items:center;gap:3px}
+.row-num-cell{display:flex;align-items:center;gap:1px}
 .row-num{font-size:14px;color:#dc2626;font-weight:800;font-family:'JetBrains Mono',monospace;flex-shrink:0}
 .sep{font-size:10px;color:#cbd5e1;flex-shrink:0}
 .plate-inp-row{
@@ -278,15 +278,6 @@ td.td-d{padding-left:1px;padding-right:1px}
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         บันทึกแล้ว
       </span>
-    </div>
-
-    <!-- Display toggle -->
-    <div class="settings-row" style="margin-top:.75rem;padding-top:.75rem;border-top:1px solid #e8eef5">
-      <span class="settings-label">แสดงผล</span>
-      <div class="pills">
-        <div class="pill active" id="pill-ts">TS%</div>
-        <div class="pill active" id="pill-ms">MS%</div>
-      </div>
     </div>
 
     <!-- Blank toggle -->
@@ -332,6 +323,10 @@ td.td-d{padding-left:1px;padding-right:1px}
       <div class="toolbar-btns">
         <button class="btn-sm export" id="btn-export">↓ Export CSV</button>
         <button class="btn-sm danger" id="btn-clear-all">ล้างทั้งหมด</button>
+        <div class="pills" style="margin-left:2px">
+          <div class="pill" id="pill-ts">TS%</div>
+          <div class="pill" id="pill-ms">MS%</div>
+        </div>
       </div>
     </div>
     <div class="table-wrap">
@@ -429,8 +424,9 @@ function renderHeader() {
   const tsHead = state.displayTS ? '<th style="text-align:right">TS%</th>' : '';
   const msHead = state.displayMS ? '<th style="text-align:right">MS%</th>' : '';
   const sub = (t) => `<span style="display:block;font-size:8px;font-weight:400;color:#94a3b8;text-transform:none;letter-spacing:0;margin-top:1px">${t}</span>`;
+  const plateHead = `<span style="color:#dc2626;font-weight:800">#</span><span style="display:block;font-size:9px;font-weight:600;text-transform:none;letter-spacing:0;color:#4a6080;margin-top:1px">Plate</span><span style="display:block;font-size:8px;font-weight:400;text-transform:none;letter-spacing:0;color:#94a3b8">Number</span>`;
   document.getElementById('table-head').innerHTML =
-    `<tr><th><span style="color:#dc2626">#</span><span style="color:#cbd5e1;font-size:10px;font-weight:400"> / Plate</span></th><th>D₁${sub('ภาชนะ')}</th><th>D₂${sub('ก่อนอบ')}</th><th class="th-d3" style="color:#2563eb">D₃${sub('หลังอบ — กรอกทีหลัง')}</th>${tsHead}${msHead}<th></th></tr>`;
+    `<tr><th>${plateHead}</th><th>D₁${sub('ภาชนะ')}</th><th>D₂${sub('ก่อนอบ')}</th><th class="th-d3" style="color:#2563eb">D₃${sub('หลังอบ — กรอกทีหลัง')}</th>${tsHead}${msHead}<th></th></tr>`;
 }
 
 function renderTable() {
